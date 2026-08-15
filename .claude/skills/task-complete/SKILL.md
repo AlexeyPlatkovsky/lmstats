@@ -1,22 +1,18 @@
 ---
 name: task-complete
-description: Closes non-trivial routed work only after every planned routed artifact is present. Does not apply to trivial direct work.
+description: Closes a routed LM Speed Viewer task by checking planned work, evidence, documentation, and required release gates. Use as the final step of a non-trivial pipeline.
 ---
 
-# Task Complete
+# Complete Task
 
-Report actual execution. Do not redesign or reopen routing.
+1. Confirm every selected handoff completed or was explicitly skipped.
+2. Inspect the final diff for unrelated changes and verify documentation is
+   current where behavior, commands, or limitations changed.
+3. Report the actual status of lint, tests, coverage (when `app.py` changed),
+   browser verification (for UI), and review (for non-trivial implementation).
+4. If work is tied to a user-supplied TaskPilot ID, use `taskpilot-cli` to move
+   it only when the user requested status tracking or the manager required it.
+5. Do not commit, push, or create a TaskPilot item without explicit request.
 
-Before closure, verify every planned routed handoff has its visible output artifact. Raw tool output
-does not qualify. If any artifact is missing, blocked, or failed, report closure blocked and name
-the artifact; do not declare completion.
-
-Begin with `✅ Skill: task-complete - output below`.
-
-Use exactly this three-column table:
-
-| Step | Skill / Agent | Comment |
-|------|---------------|---------|
-
-Include every planned and executed step. Include skipped or blocked steps and explain why. For each
-routed handoff, reference its artifact label or transcript location in `Comment`.
+State completed scope, changed files, gate results, remaining risks, and any
+blocker. Never mark completion when a required gate failed or is blocked.

@@ -1,66 +1,57 @@
-# AGENT.md — Working Rules for LM Speed Viewer
+# AGENTS.md — LM Speed Viewer
 
-Read this before making any change. These rules apply to every stage of v0.2
-and beyond.
+Read this file before changing the repository.
 
-## Project in one paragraph
+## Project
 
-Local web app (FastAPI + SSE, single `app.py` module) that passively observes
-LM Studio: it runs `lms log stream --source model --filter output --stats
---json` as a child process, keeps the latest completed prediction in memory,
-and pushes updates to browser tabs over SSE. Run with `python app.py` →
-http://127.0.0.1:8765. Never proxy, restart, or configure LM Studio; never
-kill or restart the `lms`/LM Studio processes from tests.
+LM Speed Viewer is a local FastAPI + SSE app in `app.py`. It passively runs
+`lms log stream --source model --filter output --stats --json`, keeps the latest
+completed prediction in memory, and serves `http://127.0.0.1:8765`.
+
+Never proxy, restart, configure, kill, or otherwise control LM Studio or `lms`.
+Tests must not affect those processes.
 
 ## Commands
 
 ```sh
-pip install -r requirements-dev.txt   # runtime + test/lint deps (once)
-
-python app.py                          # run the app
-ruff check .                           # lint
-pytest                                 # tests
-pytest --cov=app --cov-report=term-missing --cov-fail-under=95   # tests + coverage gate
+pip install -r requirements-dev.txt
+python app.py
+ruff check .
+pytest
+pytest --cov=app --cov-report=term-missing --cov-fail-under=95
 ```
 
-Coverage measures the application module (`app.py`) only. Do not inflate it:
-no `coverage omit` tricks, no dummy tests that exist only to raise the number.
+## Operating model
 
-## Working rules
+1. Treat a request as non-trivial if it changes behavior, an API/SSE contract,
+   persistence, UI, architecture, dependencies, instructions, or needs several
+   coordinated steps.
+2. Before non-trivial work, read `.claude/skills/manager/SKILL.md` and follow
+   its selected route. Do not bypass the manager or invent a parallel workflow.
+3. For a small localized fix, inspect the affected code and tests, use TDD where
+   practical, and run focused checks. For bugs, add a regression test first.
+4. Preserve unrelated work. Do not reset, force-push, or commit/push unless the
+   user explicitly asks.
+5. Run the relevant test/lint checks after meaningful edits. Keep code simple;
+   do not add speculative abstractions or coverage-only tests.
+6. UI changes require a live browser check against `http://127.0.0.1:8765`.
+   Use `.claude/skills/playwright-cli/SKILL.md` when the available runtime has
+   browser automation; otherwise report that evidence as blocked.
+7. After non-trivial implementation, use `.claude/agents/code-reviewer.md` in a
+   fresh read-only pass when subagents are available. If not, perform that same
+   checklist separately before completion.
+8. Use `.taskpilot/` only through the `taskpilot` CLI and
+   `.claude/skills/taskpilot-cli/SKILL.md`. Track work only when the user asks
+   or the manager says the work is task-backed.
 
-1. **TDD where practical.** Write or extend a test that expresses the desired
-   behavior before changing code. For bug fixes, add a failing regression
-   test first, then fix the bug.
-2. **Run relevant tests after every significant piece of work** — not just at
-   the end. Fix breakage immediately while context is fresh.
-3. **Run lint regularly** (`ruff check .`). Keep new code lint-clean; do not
-   disable rules to silence findings.
-4. **Before declaring work complete**, run the full gate: lint + tests +
-   coverage (all must pass, see Release gates below).
-5. **UI changes:** verify meaningful UI changes with `playwright-cli` against
-   the running app (http://127.0.0.1:8765) — load the page, check the changed
-   element/behavior, capture evidence. Do not rely on code reading alone for
-   UI work.
-6. **Code review:** after implementation is complete, run the `code-reviewer`
-   subagent (`.claude/agents/code-reviewer.md`) on the completed changes. Fix
-   valid findings (all CRITICAL/HIGH; MEDIUM/LOW unless explicitly accepted
-   with a reason) and rerun the affected checks.
-7. **No unrelated scope expansion.** Do what the current task asks. No
-   speculative abstractions, no drive-by refactors, no v0.2 features before
-   their stage. If you notice an unrelated problem, note it in the summary
-   instead of fixing it.
+## Completion gates
 
-## Release gates
+Before calling work complete, report the checks actually run:
 
-A stage (and v0.2 as a whole) is releasable only when all of these pass:
+- `ruff check .`
+- `pytest`
+- coverage gate above when `app.py` changed
+- browser evidence for UI changes (otherwise N/A)
+- code-review result for non-trivial implementation
 
-```text
-lint: PASS                          ruff check .
-tests: PASS                         pytest
-coverage >= 95%: PASS               pytest --cov=app --cov-report=term-missing --cov-fail-under=95
-playwright-cli verification: PASS   required for UI changes (N/A if no UI changed)
-code-reviewer: PASS                 run after implementation; CRITICAL/HIGH findings fixed, MEDIUM/LOW addressed or explicitly accepted
-```
-
-Report the actual result of each gate in your final summary. Do not claim a
-gate passed without running it.
+Do not claim a gate passed unless it ran and passed.
