@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# Practical baseline: pyflakes (F) + pycodestyle errors (E).
+select = ["E", "F"]
+
+[tool.pytest.ini_options]
+# Make the root-level `app` module importable in tests and resolvable by pytest-cov.
+pythonpath = ["."]

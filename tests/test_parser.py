@@ -52,9 +52,11 @@ def test_malformed_json_ignored():
 
 def test_unrelated_events_ignored():
     # input-side event (would appear without --filter output)
-    assert parse_line(json.dumps({"timestamp": 1, "data": {"type": "llm.prediction.input", "input": "x"}})) is None
+    event = json.dumps({"timestamp": 1, "data": {"type": "llm.prediction.input", "input": "x"}})
+    assert parse_line(event) is None
     # server source event
-    assert parse_line(json.dumps({"timestamp": 1, "data": {"type": "server.request", "path": "/v1/chat/completions"}})) is None
+    data = {"type": "server.request", "path": "/v1/chat/completions"}
+    assert parse_line(json.dumps({"timestamp": 1, "data": data})) is None
     # non-dict JSON
     assert parse_line("[1, 2, 3]") is None
     # dict without data
@@ -63,7 +65,8 @@ def test_unrelated_events_ignored():
 
 def test_missing_optional_fields_do_not_crash():
     # prediction event with no stats at all
-    p = parse_line(json.dumps({"timestamp": 5, "data": {"type": "llm.prediction.output", "output": "hi"}}))
+    event = json.dumps({"timestamp": 5, "data": {"type": "llm.prediction.output", "output": "hi"}})
+    p = parse_line(event)
     assert p is not None
     assert p["modelIdentifier"] is None
     assert p["tokensPerSecond"] is None
