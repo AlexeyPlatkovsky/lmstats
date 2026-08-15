@@ -28,6 +28,7 @@ Ask the user only when a missing decision would materially change behavior.
 | --- | --- |
 | Behavior, bug fix, refactor, API, persistence, dependency | `pipelines/change.md` |
 | UI behavior or markup/style | `pipelines/ui-change.md` |
+| Test-only change | `skills/test-change/SKILL.md`, then validation and completion |
 | Instruction system | `pipelines/instruction-change.md` |
 | TaskPilot query or update | `skills/taskpilot-cli/SKILL.md` |
 | Read-only review | `agents/code-reviewer.md` |
@@ -43,7 +44,7 @@ explicit tracking operation. Do not create task items automatically.
 - Behavior changes: tests before implementation where practical; always run
   validation afterward.
 - UI: browser verification is required when automation is available.
-- Medium/high risk: independent code review after validation.
+- Every non-trivial implementation: independent code review after validation.
 - Keep documentation current when commands, behavior, limitations, or project
   structure change.
 
