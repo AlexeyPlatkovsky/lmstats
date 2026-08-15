@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%233fb950'/></svg>">
+<title>LM Speed Viewer</title>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --fg: #c9d1d9;
+    --dim: #8b949e;
+    --accent: #3fb950;
+    --warn: #d29922;
+    --err: #f85149;
+    --line: #21262d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .panel { width: min(540px, 92vw); padding: 28px 32px; }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 30px;
+  }
+  h1 { font-size: 12px; letter-spacing: .2em; color: var(--dim); font-weight: 600; }
+  .status { font-size: 13px; color: var(--dim); display: flex; align-items: center; gap: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); flex: none; }
+  .dot.connected { background: var(--accent); box-shadow: 0 0 8px rgba(63,185,80,.7); }
+  .dot.waiting { background: var(--warn); box-shadow: 0 0 8px rgba(210,153,34,.7); }
+  .dot.disconnected, .dot.error { background: var(--err); box-shadow: 0 0 8px rgba(248,81,73,.6); }
+  .speed {
+    font-size: clamp(56px, 14vw, 88px); line-height: 1.05; font-weight: 700;
+    color: var(--accent); text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .speed .unit { font-size: 24px; color: var(--dim); margin-left: 10px; font-weight: 500; }
+  .model { text-align: center; font-size: 16px; margin-top: 10px; color: var(--fg); }
+  table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+  td { padding: 8px 0; font-size: 15px; border-bottom: 1px solid var(--line); }
+  td.k { color: var(--dim); width: 45%; }
+  td.v { text-align: right; font-variant-numeric: tabular-nums; }
+  .foot { margin-top: 20px; color: var(--dim); font-size: 13px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <header>
+    <h1>LM SPEED VIEWER</h1>
+    <span class="status"><span id="dot" class="dot"></span><span id="statusText">Connecting…</span></span>
+  </header>
+
+  <div class="speed"><span id="speed">—</span><span class="unit" id="speedUnit"></span></div>
+  <div class="model" id="model">—</div>
+
+  <table>
+    <tr><td class="k">TTFT</td><td class="v" id="ttft">—</td></tr>
+    <tr><td class="k">Prompt</td><td class="v" id="prompt">—</td></tr>
+    <tr><td class="k">Output</td><td class="v" id="output">—</td></tr>
+    <tr><td class="k">Total</td><td class="v" id="total">—</td></tr>
+    <tr><td class="k">Generation time</td><td class="v" id="gentime">—</td></tr>
+  </table>
+
+  <div class="foot"><span>Last update: <span id="updated">—</span></span><span>v0.1</span></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+function fmt(v, kind) {
+  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (kind === "int") return Math.round(v).toLocaleString("en-US");
+  if (kind === "sec") return v.toFixed(1) + " s";
+  if (kind === "tps") return v.toFixed(1);
+  return String(v);
+}
+
+function render(s) {
+  const c = s.collector || "disconnected";
+  const p = s.prediction;
+
+  let dotClass, statusText;
+  if (c === "connected" && p) { dotClass = "connected"; statusText = "Connected"; }
+  else if (c === "connected") { dotClass = "waiting"; statusText = "Waiting for first prediction"; }
+  else if (c === "error") { dotClass = "error"; statusText = s.detail ? `Error: ${s.detail}` : "Error"; }
+  else { dotClass = c; statusText = s.detail ? `${c[0].toUpperCase() + c.slice(1)}: ${s.detail}` : c[0].toUpperCase() + c.slice(1); }
+
+  $("dot").className = "dot " + dotClass;
+  $("statusText").textContent = statusText;
+
+  const hasSpeed = p && p.tokensPerSecond !== null && p.tokensPerSecond !== undefined;
+  $("speed").textContent = hasSpeed ? fmt(p.tokensPerSecond, "tps") : "—";
+  $("speedUnit").textContent = hasSpeed ? "tok/s" : "";
+  $("model").textContent = (p && p.modelIdentifier) || "—";
+
+  $("ttft").textContent = fmt(p && p.timeToFirstTokenSec, "sec");
+  $("prompt").textContent = fmt(p && p.promptTokensCount, "int");
+  $("output").textContent = fmt(p && p.predictedTokensCount, "int");
+  $("total").textContent = fmt(p && p.totalTokensCount, "int");
+  $("gentime").textContent = fmt(p && p.totalTimeSec, "sec");
+
+  if (p && p.timestampMs) {
+    $("updated").textContent = new Date(p.timestampMs).toLocaleTimeString("en-GB", { hour12: false });
+  } else {
+    $("updated").textContent = "—";
+  }
+}
+
+const es = new EventSource("/events");
+es.onmessage = (e) => { try { render(JSON.parse(e.data)); } catch (_) {} };
+es.onerror = () => { /* EventSource reconnects automatically */ };
+</script>
+</body>
+</html>
