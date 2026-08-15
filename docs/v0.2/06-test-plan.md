@@ -29,7 +29,7 @@ Existing four tests stay unchanged and must keep passing. Add:
 
 1. `test_stop_reason_captured` — real event shape → `stopReason == "eosFound"`; missing/non-str `stats.stopReason` → None.
 2. `test_output_captured` — `data.output` string → `output`; missing/non-str → None.
-3. Existing valid/malformed/unrelated/missing-field tests continue to assert the full dict, now including the two new keys (update expected dicts).
+3. The existing valid/malformed/unrelated/missing-field tests assert per-key and keep passing unchanged; add the two new keys (`stopReason`, `output`) to the valid-event test's assertions only.
 
 ## B. SQLite layer (`tests/test_db.py`, new)
 

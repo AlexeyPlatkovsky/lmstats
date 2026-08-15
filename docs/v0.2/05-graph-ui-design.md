@@ -70,7 +70,7 @@ No axes, no legend. Switching ranges re-evaluates the state per range.
 The existing SSE handler keeps updating hero/metrics exactly as in v0.1. Additionally:
 
 - On each SSE message whose `prediction` is non-null, refresh the **currently selected** history range via `fetchHistory(currentRange)`.
-- Dedupe: keep the last refreshed `prediction.timestampMs`; ignore messages whose timestamp equals it (the connect-time snapshot re-sends the latest prediction and must not double-fetch).
+- Dedupe: keep the last refreshed `prediction.timestampMs`, starting **null**. The connect-time snapshot (which re-sends the latest prediction) therefore triggers exactly one refresh — this is expected and asserted by §9 check 7. Later messages whose `timestampMs` equals the last refreshed value are ignored, so a re-delivered snapshot never double-fetches.
 - Coalescing: if a fetch is already in flight when a refresh is requested, set a `pendingRefresh` flag; when the in-flight fetch completes, fire exactly one follow-up if the flag is set. This bounds refreshes to at most one per new prediction plus user clicks — no timers, no polling.
 - The refresh re-renders only the graph/legend; hero and metrics are untouched by it.
 
@@ -95,7 +95,7 @@ Run against `http://127.0.0.1:8765` with the app started using `LM_SPEED_VIEWER_
 3. **Range switching** — clicking `5m` / `24h` moves the active state and issues `/api/history?range=5m|24h`; no page reload.
 4. **Graph renders** — with a seeded DB, the SVG contains one path per model and circles for points.
 5. **Empty state** — with an empty DB, the exact text `No generations recorded in this period.` is shown.
-6. **Multiple series distinguishable** — two seeded models produce two paths with different stroke colors; legend lists both.
+6. **Multiple series distinguishable** — two seeded models produce two paths and two legend entries; the seed models are chosen so their `djb2(model) % 6` palette slots differ, and the test asserts the two paths carry those (different) stroke colors.
 7. **Live refresh** — on SSE connect (snapshot contains the seeded latest prediction), a `/api/history` fetch fires and the graph re-renders.
 8. **Console** — no page errors / console errors during the above.
 

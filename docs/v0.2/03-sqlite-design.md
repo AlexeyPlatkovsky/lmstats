@@ -166,7 +166,7 @@ All tests use an explicit temporary DB path (`tmp_path`); none may touch the pro
 4. **Latest lookup** — with several rows, returns the one with max `(timestamp, id)`; a later-inserted row with an equal timestamp wins.
 5. **Persistence across reopen** — insert, close all connections, `connect` again: rows and latest survive.
 6. **Null optional fields** — a prediction with `model`/stats all None stores NULLs and reads back as None; the row is still returned by latest.
-7. **Timestamp normalization** — `format_timestamp` is exact at millisecond precision (no float drift), produces the `Z`-suffixed fixed-width format, and is lexicographically ordered; missing input falls back to "now" (assert only format/monotonicity, never an exact wall-clock value).
+7. **Timestamp normalization** — `format_timestamp` is exact at millisecond precision (no float drift), produces the `Z`-suffixed fixed-width format, and is lexicographically ordered; missing input falls back to "now" (assert only format/monotonicity, never an exact wall-clock value). Window boundary inclusion/exclusion is asserted at the history layer (`04-history-api-design.md` §8, `06-test-plan.md` C.4), which relies on this format's lexicographic ordering.
 8. **Test DB isolation** — the suite never opens `default_db_path()`; a test asserts inserts land only in the temp path.
 
 ## Verification (this stage)

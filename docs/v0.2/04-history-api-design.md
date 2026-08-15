@@ -119,7 +119,7 @@ BUCKET_SIZES = {"5m": 30, "1h": 60, "24h": 900}           # seconds
 def get_history(path: str, range_key: str, now: datetime) -> dict: ...
 ```
 
-`get_history` resolves the window from `now`, runs the query, buckets/aggregates per §3–§6, and returns exactly the response body of §1. The FastAPI route `GET /api/history` is a thin wrapper: validate `range` (§1), call `get_history(path, range_key, now=utcnow())`, return the dict as JSON.
+`get_history` resolves the window from `now`, runs the query, buckets/aggregates per §3–§6, and returns exactly the response body of §1. The FastAPI route `GET /api/history` is a thin wrapper: validate `range` (§1), call `get_history(path, range_key, now=utcnow())`, return the dict as JSON. The route resolves `path` **per request** (or from state stored in the app at lifespan startup) — never via an import-time `db.default_db_path()` binding — so tests can monkeypatch `db.default_db_path` to a temp path (stage 6 fixture rules) without touching the production database.
 
 ## 8. Test matrix
 

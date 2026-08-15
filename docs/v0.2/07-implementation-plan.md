@@ -33,24 +33,27 @@ Each "add tests" step must be written to fail first, then made green by the foll
  5. implement db.get_history + RANGE_DURATIONS/BUCKET_SIZES [green]
  6. run: pytest tests/test_db.py tests/test_history.py + coverage (db)
  7. add Group D history-API tests (test_api.py)             [red]
- 8. implement GET /api/history route + parser stopReason/output   [green]
- 9. run: pytest tests/test_api.py + ruff check .
-10. add Group E startup tests (dedicated seeded fixture)    [red]
-11. implement lifespan wiring: resolve path, init_db, load latest before start   [green]
-12. add Group F collector write-path tests (test_collector.py)   [red]
-13. implement Collector persistence: db_path, insert→state→publish, non-fatal error   [green]
-14. BARRIER — full regression: ruff check . + pytest (all) + coverage gate (app+db ≥95%)
-15. implement graph UI in static/index.html (stage 5)       [no new Python]
-16. run full automated checks again; update README.md + AGENTS.md docs
-17. real LM Studio integration acceptance (Group G, manual) [release gate]
+ 8. implement GET /api/history route                        [green]
+ 9. add Group A parser tests (test_parser.py)               [red]
+10. implement parser stopReason/output keys                 [green]
+11. run: pytest tests/test_api.py + ruff check .
+12. add Group E startup tests (dedicated seeded fixture)    [red]
+13. implement lifespan wiring: resolve path, init_db, load latest before start,
+    and set collector.db_path to the resolved path          [green]
+14. add Group F collector write-path tests (test_collector.py)   [red]
+15. implement Collector persistence: db_path, insert→state→publish, non-fatal error   [green]
+16. BARRIER — full regression: ruff check . + pytest (all) + coverage gate (app+db ≥95%)
+17. implement graph UI in static/index.html (stage 5)       [no new Python]
+18. run full automated checks again; update README.md + AGENTS.md docs
+19. real LM Studio integration acceptance (Group G, manual) [release gate]
      — if the implementing agent itself runs through LM Studio, its own
        generation may serve as the real telemetry (tasks/08)
-18. playwright-cli browser acceptance (Group H + the extra checks in tasks/08:
+20. playwright-cli browser acceptance (Group H + the extra checks in tasks/08:
      page load, layout readability)                          [release gate]
-19. code-reviewer fresh read-only pass → fix valid findings → rerun all release gates
+21. code-reviewer fresh read-only pass → fix valid findings → rerun all release gates
 ```
 
-Steps 15–16 change only the frontend and docs; they add no Python, so the coverage gate is unaffected but must still be rerun to confirm nothing regressed.
+Steps 17–18 change only the frontend and docs; they add no Python, so the coverage gate is unaffected but must still be rerun to confirm nothing regressed.
 
 ## 3. Scope boundaries (explicitly prohibited in v0.2)
 
@@ -72,7 +75,7 @@ If a need for any of these appears during implementation, stop and return to the
 | Risk | Mitigation / gate |
 | --- | --- |
 | Timestamp float drift or format mismatch breaking string comparison | `format_timestamp` uses integer-ms arithmetic (stage 3 §3); B.8 asserts exact ms + lexicographic order; C.4 boundary tests. |
-| SQLite reader/writer lock errors (FastAPI reads + collector writes) | WAL set in `init_db`; one short-lived connection per operation (stage 3 §5); F.1 runs with an SSE subscriber attached to prove a write succeeds alongside a reader. |
+| SQLite reader/writer lock errors (FastAPI reads + collector writes) | WAL set in `init_db` plus one short-lived connection per operation makes concurrent read/write safe by construction (stage 3 §5); F.1 proves the write path coexists with SSE publish. |
 | Duplicate inserts (same event stored twice) | One insert per valid line at the single `_run` choke point; F.2 asserts invalid/unrelated lines create zero rows; G verifies one real generation → exactly one row. |
 | Multiple models mixed into one series | Group-by `(model, bucket)` in `get_history`; C.5 + D.5 assert separation; H.6 asserts two visually distinct series. |
 | Long-range graph point count exploding | Bucketing bounds points to ≤96 per range (stage 4 §3); C.7 asserts absolute bucket alignment; no per-row points are emitted. |
