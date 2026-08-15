@@ -3,9 +3,9 @@ id: LMS-10
 title: 'Stage 8: implement and release v0.2'
 priority: high
 type: task
-status: backlog
+status: done
 created_at: '2026-08-15T10:21:54Z'
-updated_at: '2026-08-15T10:21:54Z'
+updated_at: '2026-08-16T01:00:00Z'
 parent_id: LMS-3
 description: 'Implement only the approved v0.2 SQLite persistence, startup restore, history API (5m/1h/24h), separate model series, and minimal graph UI; complete lint, tests, coverage, real telemetry, browser, review, and README gates. Source: tasks/08-implement-v0.2.md.'
 created_by: codex

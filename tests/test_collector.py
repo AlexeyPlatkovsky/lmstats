@@ -1,11 +1,14 @@
 """Tests for the lms log stream collector: subprocess lifecycle and pub/sub."""
 
 import asyncio
+import contextlib
 import json
 import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+import db  # noqa: E402
 
 import app as app_module  # noqa: E402
 from app import Collector, PREDICTION_TYPE  # noqa: E402
@@ -275,3 +278,54 @@ def test_stop_kills_on_timeout(monkeypatch):
         assert proc.terminated and proc.killed
 
     run(scenario())
+
+
+def test_persist_inserts_each_prediction(tmp_path):
+    path = str(tmp_path / "history.db")
+    db.init_db(path)
+
+    async def scenario():
+        c = Collector(db_path=path)
+        proc = FakeProc(stdout_lines=[PREDICTION_LINE])
+        c.proc = proc
+        await c._run()
+
+    run(scenario())
+
+    conn = db.connect(path)
+    try:
+        rows = conn.execute("SELECT model, tokens_per_second FROM predictions").fetchall()
+    finally:
+        conn.close()
+    assert len(rows) == 1
+    assert rows[0]["model"] == "test-model"
+    assert rows[0]["tokens_per_second"] == 12.5
+
+
+def test_persist_failure_does_not_break_live_view(tmp_path, monkeypatch, capsys):
+    path = str(tmp_path / "history.db")
+    db.init_db(path)
+
+    def boom(conn, pred, raw_line):
+        raise RuntimeError("disk on fire")
+
+    monkeypatch.setattr(db, "insert_prediction", boom)
+
+    async def scenario():
+        c = Collector(db_path=path)
+        c.status = "connected"
+        proc = FakeProc(stdout_lines=[PREDICTION_LINE], stdout_block_on_eof=True)
+        c.proc = proc
+        q = asyncio.Queue(maxsize=10)
+        c.subscribers.add(q)
+        task = asyncio.create_task(c._run())
+        await q.get()
+        assert c.prediction["modelIdentifier"] == "test-model"
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+
+    run(scenario())
+
+    err = capsys.readouterr().err
+    assert "failed to persist prediction" in err

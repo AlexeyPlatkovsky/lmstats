@@ -40,17 +40,17 @@ Each "add tests" step must be written to fail first, then made green by the foll
 12. add Group E startup tests (dedicated seeded fixture)    [red]
 13. implement lifespan wiring: resolve path, init_db, load latest before start,
     and set collector.db_path to the resolved path          [green]
-14. add Group F collector write-path tests (test_collector.py)   [red]
-15. implement Collector persistence: db_path, insert→state→publish, non-fatal error   [green]
-16. BARRIER — full regression: ruff check . + pytest (all) + coverage gate (app+db ≥95%)
-17. implement graph UI in static/index.html (stage 5)       [no new Python]
-18. run full automated checks again; update README.md + AGENTS.md docs
-19. real LM Studio integration acceptance (Group G, manual) [release gate]
-     — if the implementing agent itself runs through LM Studio, its own
-       generation may serve as the real telemetry (tasks/08)
-20. playwright-cli browser acceptance (Group H + the extra checks in tasks/08:
-     page load, layout readability)                          [release gate]
-21. code-reviewer fresh read-only pass → fix valid findings → rerun all release gates
+ 14. add Group F collector write-path tests (test_collector.py)   [red] ✓
+ 15. implement Collector persistence: db_path, insert→state→publish, non-fatal error   [green] ✓
+ 16. BARRIER — full regression: ruff check . + pytest (all) + coverage gate (app+db ≥95%) ✓
+ 17. implement graph UI in static/index.html (stage 5)       [no new Python] ✓
+ 18. run full automated checks again; update README.md + AGENTS.md ✓
+ 19. real LM Studio integration acceptance (Group G, manual) [release gate]
+      — if the implementing agent itself runs through LM Studio, its own
+        generation may serve as the real telemetry (tasks/08)
+ 20. playwright-cli browser acceptance (Group H + the extra checks in tasks/08:
+      page load, layout readability)                          [release gate]
+ 21. code-reviewer fresh read-only pass → fix valid findings → rerun all release gates
 ```
 
 Steps 17–18 change only the frontend and docs; they add no Python, so the coverage gate is unaffected but must still be rerun to confirm nothing regressed.

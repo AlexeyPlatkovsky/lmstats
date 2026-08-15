@@ -1,0 +1,180 @@
+"""SQLite persistence for LM Speed Viewer v0.2 (docs/v0.2/03-sqlite-design.md).
+
+One database file, one `predictions` table, two indexes. Every valid completed
+prediction is inserted exactly once; the latest row loads on startup; history
+survives viewer restart. One short-lived connection per operation; no ORM, no
+migrations, no new dependencies.
+"""
+
+import os
+import sqlite3
+from contextlib import closing
+from datetime import datetime, timedelta, timezone
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS predictions (
+  id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+  timestamp                   TEXT    NOT NULL,
+  model                       TEXT,
+  tokens_per_second           REAL,
+  time_to_first_token_seconds REAL,
+  total_time_seconds          REAL,
+  prompt_tokens               INTEGER,
+  output_tokens               INTEGER,
+  total_tokens                INTEGER,
+  stop_reason                 TEXT,
+  response                    TEXT,
+  raw_event                   TEXT    NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_timestamp
+  ON predictions (timestamp, id);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_model_timestamp
+  ON predictions (model, timestamp);
+"""
+
+EPOCH = datetime.fromtimestamp(0, tz=timezone.utc)
+
+
+def default_db_path() -> str:
+    """Env LM_SPEED_VIEWER_DB override, else ~/.lmstudio-speed-viewer/history.db."""
+    env = os.environ.get("LM_SPEED_VIEWER_DB")
+    if env:
+        return env
+    return os.path.join(os.path.expanduser("~"), ".lmstudio-speed-viewer", "history.db")
+
+
+def init_db(path: str) -> None:
+    """Create the parent dir, set WAL, and apply the idempotent schema."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with closing(connect(path)) as conn:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.executescript(SCHEMA)
+        conn.commit()
+
+
+def connect(path: str) -> sqlite3.Connection:
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def format_datetime(dt: datetime) -> str:
+    """ISO-8601 UTC with millisecond precision and a Z suffix (fixed width, sortable)."""
+    return dt.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def format_timestamp(ms: int | None) -> str:
+    """Epoch milliseconds in the storage format; None means "now" at call time."""
+    if ms is None:
+        return format_datetime(datetime.now(timezone.utc))
+    return format_datetime(EPOCH + timedelta(milliseconds=int(ms)))
+
+
+def _timestamp_ms(text: str) -> int:
+    dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    return (dt - EPOCH) // timedelta(milliseconds=1)
+
+
+def insert_prediction(conn: sqlite3.Connection, pred: dict, raw_line: str) -> int:
+    """Insert one normalized prediction; returns the new rowid."""
+    cur = conn.execute(
+        """INSERT INTO predictions (
+               timestamp, model, tokens_per_second, time_to_first_token_seconds,
+               total_time_seconds, prompt_tokens, output_tokens, total_tokens,
+               stop_reason, response, raw_event)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            format_timestamp(pred.get("timestampMs")),
+            pred.get("modelIdentifier"),
+            pred.get("tokensPerSecond"),
+            pred.get("timeToFirstTokenSec"),
+            pred.get("totalTimeSec"),
+            pred.get("promptTokensCount"),
+            pred.get("predictedTokensCount"),
+            pred.get("totalTokensCount"),
+            pred.get("stopReason"),
+            pred.get("output"),
+            raw_line,
+        ),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def row_to_prediction(row: sqlite3.Row) -> dict:
+    """Row back to the normalized camelCase shape (identical keys to parse_line)."""
+    return {
+        "modelIdentifier": row["model"],
+        "tokensPerSecond": row["tokens_per_second"],
+        "timeToFirstTokenSec": row["time_to_first_token_seconds"],
+        "totalTimeSec": row["total_time_seconds"],
+        "promptTokensCount": row["prompt_tokens"],
+        "predictedTokensCount": row["output_tokens"],
+        "totalTokensCount": row["total_tokens"],
+        "timestampMs": _timestamp_ms(row["timestamp"]),
+        "stopReason": row["stop_reason"],
+        "output": row["response"],
+    }
+
+
+def latest_prediction(conn: sqlite3.Connection) -> dict | None:
+    """The row with max (timestamp, id), or None on an empty database."""
+    row = conn.execute(
+        "SELECT * FROM predictions ORDER BY timestamp DESC, id DESC LIMIT 1"
+    ).fetchone()
+    return row_to_prediction(row) if row is not None else None
+
+
+RANGE_DURATIONS = {"5m": 300, "1h": 3600, "24h": 86400}   # seconds
+BUCKET_SIZES = {"5m": 30, "1h": 60, "24h": 900}           # seconds
+
+
+def get_history(path: str, range_key: str, now: datetime) -> dict:
+    """Bucketed per-model speed history for the window ending at `now`.
+
+    Reads only rows inside [now - duration, now] (stage 4 §2), buckets them by
+    absolute UTC boundaries (stage 4 §3), and aggregates per (model, bucket) in
+    Python. Nothing aggregated is stored; models are never mixed.
+    """
+    now_ms = _timestamp_ms(format_datetime(now))
+    start_text = format_timestamp(now_ms - RANGE_DURATIONS[range_key] * 1000)
+    end_text = format_timestamp(now_ms)
+    bucket_ms = BUCKET_SIZES[range_key] * 1000
+
+    with closing(connect(path)) as conn:
+        rows = conn.execute(
+            "SELECT model, timestamp, tokens_per_second FROM predictions"
+            " WHERE timestamp >= ? AND timestamp <= ? ORDER BY model, timestamp",
+            (start_text, end_text),
+        ).fetchall()
+
+    buckets: dict[tuple, list] = {}
+    for row in rows:
+        key = (row["model"], _timestamp_ms(row["timestamp"]) // bucket_ms * bucket_ms)
+        agg = buckets.setdefault(key, [0, 0.0, 0])  # count, speed sum, non-null n
+        agg[0] += 1
+        if row["tokens_per_second"] is not None:
+            agg[1] += row["tokens_per_second"]
+            agg[2] += 1
+
+    series: dict = {}
+    for (model, bucket_start), (count, speed_sum, speed_n) in buckets.items():
+        avg = round(speed_sum / speed_n, 2) if speed_n else None
+        series.setdefault(model, []).append({
+            "timestamp": format_timestamp(bucket_start),
+            "avgTokensPerSecond": avg,
+            "count": count,
+        })
+
+    ordered = [
+        {"model": model, "points": sorted(points, key=lambda p: p["timestamp"])}
+        for model, points in sorted(
+            series.items(), key=lambda item: (item[0] is None, item[0] or ""))
+    ]
+    return {
+        "range": range_key,
+        "generatedAt": format_datetime(now),
+        "series": ordered,
+    }
