@@ -1,0 +1,10 @@
+schema_version: 1
+id: LMS-1
+title: LM Speed Viewer v0.2
+priority: high
+type: epic
+status: backlog
+created_at: '2026-08-15T10:21:24Z'
+updated_at: '2026-08-15T10:21:24Z'
+description: 'Deliver the bounded v0.2 release: durable prediction history, history API, and a minimal generation-speed graph while preserving v0.1 behavior.'
+created_by: codex

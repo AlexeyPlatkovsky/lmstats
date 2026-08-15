@@ -1,0 +1,15 @@
+schema_version: 1
+id: LMS-7
+title: 'Stage 5: specify the minimal history graph UI'
+priority: normal
+type: task
+status: backlog
+created_at: '2026-08-15T10:21:52Z'
+updated_at: '2026-08-15T10:22:16Z'
+parent_id: LMS-2
+description: 'Create docs/v0.2/05-graph-ui-design.md preserving the v0.1 hero and defining controls, SVG/canvas graph behavior, colors, empty/error states, live refresh, and browser checks. Source: tasks/05-graph-ui-design.md.'
+links:
+  blocks:
+  - LMS-8
+  - LMS-9
+created_by: codex

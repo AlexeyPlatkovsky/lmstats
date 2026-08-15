@@ -1,0 +1,11 @@
+schema_version: 1
+id: LMS-3
+title: v0.2 persistence and history graph delivery
+priority: high
+type: feature
+status: backlog
+created_at: '2026-08-15T10:21:34Z'
+updated_at: '2026-08-15T10:21:34Z'
+parent_id: LMS-1
+description: Implement and release the approved v0.2 SQLite persistence, historical speed API, and minimal graph UI with all release gates.
+created_by: codex
