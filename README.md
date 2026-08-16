@@ -16,7 +16,9 @@ LM Studio in any way.
 - Prompt / output / total token counts
 - Generation time
 - Collector status (Connected / Disconnected / Error / Waiting for first prediction)
-- Historical speed graph (5m / 15m / 1h / 24h ranges, stored in SQLite)
+- Historical speed graph (5m / 15m / 1h / 24h ranges, plus the last ten values
+  per model from the past month; stored in SQLite)
+- Clickable model legend for filtering and hover comparison
 - The eight most recent generations, regardless of the selected graph range
 
 ## Requirements
@@ -43,7 +45,7 @@ Then open: **http://127.0.0.1:8765**
 
 v0.2 adds local storage of all completed predictions to a SQLite database
 located at `~/.lmstudio-speed-viewer/history.db` by default. The graph UI
-reads from this database via the `/api/history` endpoint.
+reads from this database via the dashboard and history endpoints.
 
 ### Override location
 
@@ -60,4 +62,4 @@ LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
   classified and may temporarily become the latest prediction.
 - The history graph stores predictions locally; clearing the SQLite file
   removes all historical data.
-- More than six models on the graph wrap around the color palette.
+- More than six models use calculated shades of the six base graph colors.

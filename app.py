@@ -228,7 +228,7 @@ async def api_history(range: str = ""):
         range_key = range
     else:
         return JSONResponse(
-            {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"}, status_code=400)
+            {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h, 1mo"}, status_code=400)
     # Resolved per request (never at import time) so tests can monkeypatch it.
     path = db.default_db_path()
     return JSONResponse(db.get_history(path, range_key, now=_utcnow()))
@@ -267,7 +267,7 @@ async def api_dashboard(
         range_key = range or "1h"
         if range_key not in db.RANGE_DURATIONS:
             return JSONResponse(
-                {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"},
+                {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h, 1mo"},
                 status_code=400,
             )
         if at:

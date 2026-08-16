@@ -145,8 +145,170 @@ def test_mobile_recent_table_and_status_detail_use_the_shipped_ui(page, ui_url):
 def test_visible_ranges_and_recent_time_column(page, ui_url):
     now = datetime.now(timezone.utc).replace(microsecond=0)
     _open_with_legacy_api(page, ui_url, now)
-    assert page.locator("[data-range]").all_text_contents() == ["5m", "15m", "1h", "24h"]
+    assert page.locator("[data-range]").all_text_contents() == ["5m", "15m", "1h", "24h", "1mo"]
     assert page.locator(".recent-table col").first.get_attribute("style") == "width:17%"
+
+
+def test_monthly_graph_and_interactive_vertical_legend(page, ui_url):
+    """Monthly samples use an ordinal axis; legend controls filter and highlight lines."""
+    page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    history = {
+        "range": "1mo",
+        "series": [{
+            "model": model,
+            "points": [{
+                "timestamp": (now - timedelta(minutes=10 - index)).isoformat()
+                .replace("+00:00", "Z"),
+                "avgTokensPerSecond": speed,
+                "count": 1,
+            } for index, speed in enumerate(speeds)],
+        } for model, speeds in (("alpha", [10, 20]), ("beta", [30, 40, 50]))],
+    }
+    page.route(
+        "**/api/dashboard?**",
+        lambda route: route.fulfill(content_type="application/json", body=json.dumps({
+            "range": "1mo", "history": history, "recent": [], "summary": [],
+        })),
+    )
+    page.goto(ui_url)
+    page.get_by_role("button", name="1mo").click()
+    page.get_by_role("button", name="alpha").wait_for()
+
+    assert page.locator("#graphSvg text").all_text_contents()[-10:] == [
+        str(value) for value in range(1, 11)
+    ]
+    legend = page.locator("#legend")
+    assert legend.evaluate("element => getComputedStyle(element).flexDirection") == "column"
+
+    alpha = page.get_by_role("button", name="alpha")
+    alpha.hover()
+    assert page.locator('#graphSvg path[data-model="alpha"]').get_attribute("stroke-width") == "3"
+    alpha.hover(position={"x": 1, "y": 1})
+    page.mouse.move(1200, 100)
+    assert page.locator('#graphSvg path[data-model="alpha"]').get_attribute("stroke-width") == "1.5"
+
+    alpha.click()
+    assert alpha.get_attribute("aria-pressed") == "false"
+    assert page.locator('#graphSvg path[data-model="alpha"]').count() == 0
+    assert float(alpha.evaluate("element => getComputedStyle(element).opacity")) == .5
+
+
+def test_model_palette_assigns_unique_base_colours_then_derived_shades(page, ui_url):
+    """Model order, not a hash collision, determines the first six graph colours."""
+    page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    history = {
+        "series": [{
+            "model": f"model-{index}",
+            "points": [{
+                "timestamp": now.isoformat().replace("+00:00", "Z"),
+                "avgTokensPerSecond": 10 + index,
+                "count": 1,
+            }],
+        } for index in range(7)],
+    }
+    page.route(
+        "**/api/dashboard?**",
+        lambda route: route.fulfill(content_type="application/json", body=json.dumps({
+            "history": history, "recent": [], "summary": [],
+        })),
+    )
+    page.goto(ui_url)
+    page.locator("#legend .swatch").last.wait_for()
+
+    colours = page.locator("#legend .swatch").evaluate_all(
+        "elements => elements.map(element => element.style.background)"
+    )
+    assert colours[:6] == [
+        "rgb(56, 255, 20)", "rgb(229, 184, 0)", "rgb(57, 197, 207)",
+        "rgb(188, 140, 255)", "rgb(247, 120, 186)", "rgb(88, 166, 255)",
+    ]
+    assert colours[6] not in colours[:6]
+
+
+def test_penpot_desktop_layout_and_accessible_theme_switch(page, ui_url):
+    """The shipped UI preserves the Penpot desktop composition and theme control."""
+    page.set_viewport_size({"width": 1280, "height": 720})
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    _open_with_legacy_api(page, ui_url, now)
+
+    layout = page.evaluate("""() => {
+        const box = selector => document.querySelector(selector).getBoundingClientRect().toJSON();
+        return {app: box('.app'), live: box('.live'), recent: box('.recent'),
+                chart: box('.chart'), summary: box('.summary')};
+    }""")
+    assert layout["app"]["width"] == 1280
+    assert layout["live"]["width"] == 390
+    assert layout["live"]["height"] == layout["recent"]["height"] == 260
+    assert layout["summary"]["height"] == 100
+    assert layout["chart"]["width"] == layout["summary"]["width"] == 1248
+    assert page.get_by_role("heading", name="GENERATION SPEED").count() == 1
+
+    toggle = page.get_by_role("button", name="Switch to light theme")
+    toggle.focus()
+    page.keyboard.press("Enter")
+    assert page.locator("html").get_attribute("data-theme") == "light"
+    assert page.get_by_role("button", name="Switch to dark theme").count() == 1
+    assert page.evaluate("localStorage.getItem('theme')") == "light"
+
+
+def test_theme_text_colours_meet_wcag_aa_contrast(page, ui_url):
+    """Both theme palettes keep all text-bearing UI treatments at 4.5:1 or higher."""
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    _open_with_legacy_api(page, ui_url, now)
+
+    contrasts = page.evaluate("""() => {
+        const luminance = color => {
+            const rgb = color.match(/\\d+(?:\\.\\d+)?/g).slice(0, 3).map(Number).map(value => {
+                value /= 255;
+                return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+            });
+            return .2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2];
+        };
+        const ratio = (foreground, background) => {
+            const [light, dark] = [luminance(foreground), luminance(background)]
+                .sort((a, b) => b - a);
+            return (light + .05) / (dark + .05);
+        };
+        const pairs = [
+            ['.title', 'body'], ['.status', 'body'], ['.range-btn', '.range-btn'],
+            ['.selected', 'body'], ['.nav-btn', 'body'], ['.timestamp', '.live'],
+            ['.metric', '.live'], ['.value', '.live'], ['.panel-title', '.recent'],
+            ['.data-table th', '.recent'], ['.data-table td', '.recent'],
+            ['.empty-text', '.graph'], ['.legend', 'body'], ['.tooltip', '.tooltip'],
+        ];
+        return pairs.map(([foreground, background]) => {
+            const fg = getComputedStyle(document.querySelector(foreground)).color;
+            const bg = getComputedStyle(document.querySelector(background)).backgroundColor;
+            return {foreground, background, ratio: ratio(fg, bg)};
+        });
+    }""")
+    assert all(item["ratio"] >= 4.5 for item in contrasts), contrasts
+
+    page.get_by_role("button", name="Switch to light theme").click()
+    light_contrasts = page.evaluate("""() => {
+        const luminance = color => {
+            const rgb = color.match(/\\d+(?:\\.\\d+)?/g).slice(0, 3).map(Number).map(value => {
+                value /= 255;
+                return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+            });
+            return .2126 * rgb[0] + .7152 * rgb[1] + .0722 * rgb[2];
+        };
+        const ratio = (foreground, background) => {
+            const [light, dark] = [luminance(foreground), luminance(background)]
+                .sort((a, b) => b - a);
+            return (light + .05) / (dark + .05);
+        };
+        return [['.title', 'body'], ['.status', 'body'], ['.range-btn', '.range-btn'],
+                ['.selected', 'body'], ['.metric', '.live'], ['.value', '.live'],
+                ['.data-table th', '.recent'], ['.data-table td', '.recent'],
+                ['.empty-text', '.graph'], ['.legend', 'body'], ['.tooltip', '.tooltip']]
+            .map(([foreground, background]) => ({foreground, background,
+                ratio: ratio(getComputedStyle(document.querySelector(foreground)).color,
+                             getComputedStyle(document.querySelector(background)).backgroundColor)}));
+    }""")
+    assert all(item["ratio"] >= 4.5 for item in light_contrasts), light_contrasts
 
 
 def test_live_prediction_refreshes_the_current_dashboard_window(page, ui_url):
@@ -185,6 +347,7 @@ def test_live_prediction_refreshes_the_current_dashboard_window(page, ui_url):
     page.goto(ui_url)
     page.locator("#recentRows").get_by_text("No generations recorded yet.").wait_for()
     page.wait_for_timeout(20)
+    page.evaluate("active.end = new Date(Date.now() - 5_000)")
     event_timestamp = page.evaluate("""() => {
         const timestampMs = Date.now();
         window.latestEventSource.onmessage({data: JSON.stringify({

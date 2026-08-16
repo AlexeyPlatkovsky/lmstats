@@ -128,8 +128,8 @@ def latest_prediction(conn: sqlite3.Connection) -> dict | None:
     return row_to_prediction(row) if row is not None else None
 
 
-RANGE_DURATIONS = {"5m": 300, "15m": 900, "1h": 3600, "24h": 86400}  # seconds
-BUCKET_SIZES = {"5m": 30, "15m": 60, "1h": 60, "24h": 900}            # seconds
+RANGE_DURATIONS = {"5m": 300, "15m": 900, "1h": 3600, "24h": 86400, "1mo": 2592000}
+BUCKET_SIZES = {"5m": 30, "15m": 60, "1h": 60, "24h": 900, "1mo": 86400}
 MAX_DASHBOARD_WINDOW = timedelta(days=7)
 
 
@@ -242,20 +242,37 @@ def get_dashboard(
             "outputTokens": values["output"],
         })
 
-    series: dict = {}
-    for (model, bucket_start), (count, speed_sum, speed_n) in buckets.items():
-        series.setdefault(model, []).append({
-            "timestamp": format_timestamp(bucket_start),
-            "avgTokensPerSecond": round(speed_sum / speed_n, 2) if speed_n else None,
-            "count": count,
-        })
+    if range_key == "1mo":
+        raw_points: dict = {}
+        for row in reversed(rows):
+            if row["tokens_per_second"] is not None:
+                raw_points.setdefault(row["model"], []).append({
+                    "timestamp": row["timestamp"],
+                    "avgTokensPerSecond": row["tokens_per_second"],
+                    "count": 1,
+                })
+        history_series = [
+            {"model": model, "points": points[-10:]}
+            for model, points in sorted(
+                raw_points.items(), key=lambda item: (item[0] is None, item[0] or "")
+            )
+        ]
+    else:
+        series: dict = {}
+        for (model, bucket_start), (count, speed_sum, speed_n) in buckets.items():
+            series.setdefault(model, []).append({
+                "timestamp": format_timestamp(bucket_start),
+                "avgTokensPerSecond": round(speed_sum / speed_n, 2) if speed_n else None,
+                "count": count,
+            })
+        history_series = [
+            {"model": model, "points": sorted(series[model], key=lambda point: point["timestamp"])}
+            for model in sorted(series, key=lambda model: (model is None, model or ""))
+        ]
     history = {
         "range": range_key,
         "generatedAt": end_text,
-        "series": [
-            {"model": model, "points": sorted(series[model], key=lambda point: point["timestamp"])}
-            for model in sorted(series, key=lambda model: (model is None, model or ""))
-        ],
+        "series": history_series,
     }
     return {
         "range": range_key,

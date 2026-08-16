@@ -104,7 +104,7 @@ def test_history_24h(client, seed, sample_prediction):
 def test_history_invalid_range(client):
     r = client.get("/api/history?range=10m")
     assert r.status_code == 400
-    assert r.json() == {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"}
+    assert r.json() == {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h, 1mo"}
     # empty range behaves as the default 1h
     r = client.get("/api/history?range=")
     assert r.status_code == 200
@@ -152,6 +152,22 @@ def test_dashboard_accepts_custom_window_up_to_seven_days(client, seed, now):
     assert r.json()["range"] == "custom"
     assert r.json()["start"] == start
     assert len(r.json()["recent"]) == 1
+
+
+def test_dashboard_month_range_returns_the_last_ten_values_per_model(client, seed):
+    for index in range(11):
+        seed(
+            {"modelIdentifier": "alpha", "tokensPerSecond": float(index)},
+            ts_offset_s=-(11 - index) * 60,
+        )
+
+    r = client.get("/api/dashboard?range=1mo")
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["range"] == body["history"]["range"] == "1mo"
+    points = body["history"]["series"][0]["points"]
+    assert [point["avgTokensPerSecond"] for point in points] == list(range(1, 11))
 
 
 @pytest.mark.parametrize(
