@@ -1,4 +1,4 @@
-# LM Speed Viewer v1.0
+# LM Speed Viewer v0.9
 
 > **See how fast your local LLM is running—at the moment it matters.**
 >
@@ -96,17 +96,6 @@ python app.py
 
 Then open: **http://127.0.0.1:8765**
 
-## Versioning and npm publishing
-
-Keep the Python and npm distributions on the same version by using one of the
-following commands. They update both `pyproject.toml` and `package.json`; commit
-the resulting files with the change.
-
-```sh
-npm run version:minor    # trivial changes: 0.2.0 -> 0.3.0
-npm run version:major    # new functions: 0.2.0 -> 1.0.0
-npm run version:release  # explicit release only: 0.2.0 -> 0.2.1
-```
 
 After a versioned change is merged into `main`, the `Publish npm package`
 workflow runs the package, lint, and Python tests, then publishes only if the
@@ -122,7 +111,7 @@ publisher. No npm token is stored in this repository.
 
 ## History persistence
 
-v0.2 adds local storage of all completed predictions to a SQLite database
+The viewer stores all completed predictions in a local SQLite database
 located at `~/.lmstudio-speed-viewer/history.db` by default. The graph UI
 reads from this database via the dashboard and history endpoints.
 
