@@ -4,7 +4,7 @@ const RANGES = {"5m": 300, "15m": 900, "1h": 3600, "24h": 86400, "1mo": 2592000}
 const BUCKET_SECONDS = {"5m": 30, "15m": 60, "1h": 60, "24h": 900, "1mo": 86400};
 const PALETTES = {
   dark: ["#38ff14", "#e5b800", "#39c5cf", "#bc8cff", "#f778ba", "#58a6ff"],
-  light: ["#087d1c", "#805b00", "#006b73", "#63359c", "#a82568", "#005ca8"],
+  light: ["#0969da", "#8250df", "#087d1c", "#b54708", "#a82568", "#006b73"],
 };
 const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 let active = {range: "1h", end: new Date(), start: null};
@@ -12,6 +12,7 @@ let followingLive = true;
 let fetchSeq = 0;
 let graphState = null;
 const hiddenModels = new Set();
+const modelColorIndexes = new Map();
 let hoveredModel = null;
 
 function setTheme(theme) {
@@ -71,7 +72,7 @@ function controls() {
   $("selectedRange").textContent = time(window.start) + " → " + time(window.end);
   document.querySelectorAll("[data-range]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.range === active.range)));
   $("customBtn").setAttribute("aria-pressed", String(active.range === "custom"));
-  $("nextBtn").disabled = active.end >= Date.now() - 1000;
+  $("nextBtn").disabled = followingLive;
 }
 
 function filterHistory(history) {
@@ -104,16 +105,42 @@ function params() {
 
 function cell(value, kind) { return `<td>${fmt(value, kind)}</td>`; }
 
+function modelColorIndex(model) {
+  if (!modelColorIndexes.has(model)) modelColorIndexes.set(model, modelColorIndexes.size);
+  return modelColorIndexes.get(model);
+}
+
+function modelColor(model) { return color(modelColorIndex(model)); }
+
+function modelLabel(model) {
+  return `<span class="model-label" data-model-color-index="${modelColorIndex(model)}">${esc(model)}</span>`;
+}
+
+function setModelColors(data) {
+  modelColorIndexes.clear();
+  [
+    ...(data.history?.series || []).map(series => series.model),
+    ...(data.recent || []).map(row => row.modelIdentifier),
+    ...(data.summary || []).map(row => row.model),
+  ].forEach(modelColorIndex);
+}
+
+function refreshModelLabelColors() {
+  document.querySelectorAll(".model-label").forEach(label => {
+    label.style.color = color(Number(label.dataset.modelColorIndex));
+  });
+}
+
 function recent(rows, unavailable = "") {
   $("recentRows").innerHTML = unavailable ? `<tr><td class="empty" colspan="8">${unavailable}</td></tr>` : rows.length ? rows.map(row => {
     const date = new Date(row.timestampMs);
     const displayTime = date.toLocaleString("en-GB", {day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: LOCAL_ZONE});
-    return `<tr><td>${displayTime}</td><td title="${esc(row.modelIdentifier)}">${esc(row.modelIdentifier)}</td>${cell(row.promptTokensCount, "short")}${cell(row.predictedTokensCount, "short")}${cell(row.tokensPerSecond)}${cell(row.timeToFirstTokenSec, "sec")}${cell(row.totalTimeSec, "sec")}<td>${esc(row.stopReason)}</td></tr>`;
+    return `<tr><td>${displayTime}</td><td title="${esc(row.modelIdentifier)}">${modelLabel(row.modelIdentifier)}</td>${cell(row.promptTokensCount, "short")}${cell(row.predictedTokensCount, "short")}${cell(row.tokensPerSecond)}${cell(row.timeToFirstTokenSec, "sec")}${cell(row.totalTimeSec, "sec")}<td>${esc(row.stopReason)}</td></tr>`;
   }).join("") : '<tr><td class="empty" colspan="8">No generations recorded yet.</td></tr>';
 }
 
 function summary(rows, unavailable = "") {
-  $("summaryRows").innerHTML = unavailable ? `<tr><td class="empty" colspan="9">${unavailable}</td></tr>` : rows.length ? rows.map(row => `<tr><td title="${esc(row.model)}">${esc(row.model)}</td>${cell(row.requests, "int")}${cell(row.avgTokensPerSecond)}${cell(row.medianTokensPerSecond)}${cell(row.minTokensPerSecond)}${cell(row.maxTokensPerSecond)}${cell(row.avgTimeToFirstTokenSec, "sec")}${cell(row.promptTokens, "short")}${cell(row.outputTokens, "short")}</tr>`).join("") : '<tr><td class="empty" colspan="9">No model summary for this period.</td></tr>';
+  $("summaryRows").innerHTML = unavailable ? `<tr><td class="empty" colspan="9">${unavailable}</td></tr>` : rows.length ? rows.map(row => `<tr><td title="${esc(row.model)}">${modelLabel(row.model)}</td>${cell(row.requests, "int")}${cell(row.avgTokensPerSecond)}${cell(row.medianTokensPerSecond)}${cell(row.minTokensPerSecond)}${cell(row.maxTokensPerSecond)}${cell(row.avgTimeToFirstTokenSec, "sec")}${cell(row.promptTokens, "short")}${cell(row.outputTokens, "short")}</tr>`).join("") : '<tr><td class="empty" colspan="9">No model summary for this period.</td></tr>';
 }
 
 function color(index) {
@@ -172,7 +199,8 @@ function renderGraph(data, emptyMessage = "No generations recorded in this perio
   const legend = $("legend");
   const series = data.series || [];
   const monthly = data.range === "1mo";
-  const colors = new Map(series.map((item, index) => [item.model, color(index)]));
+  const colors = new Map(series.map(item => [item.model, modelColor(item.model)]));
+  refreshModelLabelColors();
   const points = series.flatMap(item => item.points.filter(point => point.avgTokensPerSecond != null).map(point => ({...point, model: item.model})));
   if (!points.length) {
     svg.innerHTML = "";
@@ -255,6 +283,7 @@ async function fetchHistory() {
       data = await response.json();
     }
     if (sequence !== fetchSeq) return;
+    setModelColors(data);
     recent(data.recent, data.unavailable);
     summary(data.summary, data.unavailable);
     renderGraph(data.history, data.emptyMessage);

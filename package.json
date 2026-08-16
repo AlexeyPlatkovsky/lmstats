@@ -1,0 +1,38 @@
+{
+  "name": "lm-speed-viewer",
+  "version": "0.2.0",
+  "description": "Passive local LM Studio generation speed viewer",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexeyPlatkovsky/lmstats.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexeyPlatkovsky/lmstats/issues"
+  },
+  "homepage": "https://github.com/AlexeyPlatkovsky/lmstats#readme",
+  "bin": {
+    "lm-speed-viewer": "bin/lm-speed-viewer.js"
+  },
+  "files": [
+    "bin/",
+    "lm_speed_viewer/*.py",
+    "lm_speed_viewer/static/*",
+    "app.py",
+    "db.py",
+    "pyproject.toml",
+    "requirements.txt",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/npm/**/*.test.mjs",
+    "version:minor": "node scripts/bump-version.mjs minor",
+    "version:major": "node scripts/bump-version.mjs major",
+    "version:release": "node scripts/bump-version.mjs release"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

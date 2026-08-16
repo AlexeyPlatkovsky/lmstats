@@ -29,6 +29,15 @@ OTHER_EVENT_LINE = json.dumps({
     "data": {"type": "llm.prediction.input", "input": "x"},
 }).encode()
 
+OUTLIER_PREDICTION_LINE = json.dumps({
+    "timestamp": 1786744778242,
+    "data": {
+        "type": PREDICTION_TYPE,
+        "stats": {"tokensPerSecond": 1000.0},
+        "modelIdentifier": "impossible-model",
+    },
+}).encode()
+
 
 class FakeStream:
     """Async readline() source over a fixed list of byte lines."""
@@ -301,6 +310,23 @@ def test_persist_inserts_each_prediction(tmp_path):
     assert len(rows) == 1
     assert rows[0]["model"] == "test-model"
     assert rows[0]["tokens_per_second"] == 12.5
+
+
+def test_outlier_rate_does_not_update_or_persist(tmp_path):
+    path = str(tmp_path / "history.db")
+    db.init_db(path)
+
+    async def scenario():
+        collector = Collector(db_path=path)
+        collector.proc = FakeProc(stdout_lines=[OUTLIER_PREDICTION_LINE])
+        await collector._run()
+        assert collector.prediction is None
+
+    run(scenario())
+
+    with db.connect(path) as conn:
+        count = conn.execute("SELECT COUNT(*) FROM predictions").fetchone()[0]
+    assert count == 0
 
 
 def test_persist_failure_does_not_break_live_view(tmp_path, monkeypatch, capsys):

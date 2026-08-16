@@ -20,6 +20,12 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def parse_args(argv: list[str] |
+                None = None) -> argparse.Namespace:
+    """Parse the command-line arguments."""
+    return build_parser().parse_args(argv)
+
+
 def main(argv=None) -> None:
     """Run the viewer server with command-line configuration."""
     args = build_parser().parse_args(argv)
@@ -37,3 +43,4 @@ def main(argv=None) -> None:
         log_level="warning",
         timeout_graceful_shutdown=5,
     )
+    

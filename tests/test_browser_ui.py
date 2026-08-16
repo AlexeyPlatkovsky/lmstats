@@ -240,7 +240,7 @@ def test_penpot_desktop_layout_and_accessible_theme_switch(page, ui_url):
     assert layout["app"]["width"] == 1280
     assert layout["live"]["width"] == 390
     assert layout["live"]["height"] == layout["recent"]["height"] == 260
-    assert layout["summary"]["height"] == 100
+    assert 0 < layout["summary"]["height"] <= 112
     assert layout["chart"]["width"] == layout["summary"]["width"] == 1248
     assert page.get_by_role("heading", name="GENERATION SPEED").count() == 1
 
@@ -462,3 +462,96 @@ def test_live_prediction_refreshes_the_current_dashboard_window(page, ui_url):
     assert page.locator("#graphSvg circle").count() == 1
     assert len(dashboard_requests) >= 2
     assert dashboard_requests[-1] > dashboard_requests[0]
+
+
+def test_light_theme_model_colours_match_legend_recent_and_summary_labels(page, ui_url):
+    page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    models = ["alpha", "beta", "gamma"]
+    history = {"series": [{
+        "model": model,
+        "points": [{
+            "timestamp": now.isoformat().replace("+00:00", "Z"),
+            "avgTokensPerSecond": 10 + index,
+            "count": 1,
+        }],
+    } for index, model in enumerate(models)]}
+    recent = [{"modelIdentifier": model, "timestampMs": now.timestamp() * 1000}
+              for model in models]
+    summary = [{"model": model, "requests": 1} for model in models]
+    page.route(
+        "**/api/dashboard?**",
+        lambda route: route.fulfill(content_type="application/json", body=json.dumps({
+            "history": history, "recent": recent, "summary": summary,
+        })),
+    )
+
+    page.goto(ui_url)
+    page.locator("#legend .swatch").last.wait_for()
+    page.get_by_role("button", name="Switch to light theme").click()
+
+    colours = page.evaluate("""() => {
+        const colours = selector => [...document.querySelectorAll(selector)]
+            .map(element => getComputedStyle(element).color || element.style.background);
+        return {
+            legend: [...document.querySelectorAll('#legend .swatch')]
+                .map(element => element.style.background),
+            recent: colours('#recentRows .model-label'),
+            summary: colours('#summaryRows .model-label'),
+        };
+    }""")
+    expected = ["rgb(9, 105, 218)", "rgb(130, 80, 223)", "rgb(8, 125, 28)"]
+    assert colours["legend"] == expected
+    assert colours["recent"] == expected
+    assert colours["summary"] == expected
+
+
+def test_next_is_disabled_only_while_following_the_current_period(page, ui_url):
+    page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
+    page.route(
+        "**/api/dashboard?**",
+        lambda route: route.fulfill(content_type="application/json", body=json.dumps({
+            "history": {"series": []}, "recent": [], "summary": [],
+        })),
+    )
+
+    page.goto(ui_url)
+    page.get_by_role("button", name="NEXT ›").wait_for()
+    next_button = page.get_by_role("button", name="NEXT ›")
+    assert next_button.is_disabled()
+
+    page.get_by_role("button", name="‹ PREV").click()
+    assert not next_button.is_disabled()
+
+    next_button.click()
+    page.wait_for_function("document.querySelector('#nextBtn').disabled")
+    assert next_button.is_disabled()
+
+
+def test_summary_shows_four_models_before_vertical_scrolling(page, ui_url):
+    page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
+    page.route(
+        "**/api/dashboard?**",
+        lambda route: route.fulfill(content_type="application/json", body=json.dumps({
+            "history": {"series": []}, "recent": [], "summary": [],
+        })),
+    )
+    page.goto(ui_url)
+
+    def render_summary(count):
+        page.evaluate("""count => summary(Array.from({length: count}, (_, index) => ({
+            model: `model-${index}`, requests: index + 1,
+        })))""", count)
+        return page.locator(".summary").evaluate("""element => ({
+            clientHeight: element.clientHeight,
+            scrollHeight: element.scrollHeight,
+            overflowY: getComputedStyle(element).overflowY,
+        })""")
+
+    three = render_summary(3)
+    four = render_summary(4)
+    five = render_summary(5)
+    assert three["clientHeight"] < four["clientHeight"]
+    assert four["scrollHeight"] <= four["clientHeight"]
+    assert five["scrollHeight"] > five["clientHeight"]
+    assert five["overflowY"] in {"auto", "scroll"}

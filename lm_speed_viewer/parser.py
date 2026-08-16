@@ -4,6 +4,7 @@ import json
 
 
 PREDICTION_TYPE = "llm.prediction.output"
+MAX_TOKENS_PER_SECOND = 999
 
 
 def parse_line(line):
@@ -35,9 +36,12 @@ def parse_line(line):
     timestamp = obj.get("timestamp")
     stop_reason = stats.get("stopReason")
     output = data.get("output")
+    tokens_per_second = num("tokensPerSecond")
+    if tokens_per_second is not None and tokens_per_second > MAX_TOKENS_PER_SECOND:
+        return None
     return {
         "modelIdentifier": model if isinstance(model, str) and model else None,
-        "tokensPerSecond": num("tokensPerSecond"),
+        "tokensPerSecond": tokens_per_second,
         "timeToFirstTokenSec": num("timeToFirstTokenSec"),
         "totalTimeSec": num("totalTimeSec"),
         "promptTokensCount": num("promptTokensCount"),

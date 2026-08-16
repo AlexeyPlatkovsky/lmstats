@@ -48,6 +48,20 @@ source .venv/bin/activate
 pip install -e . -r requirements-dev.txt
 ```
 
+### npm
+
+The same CLI is also published as
+[`lm-speed-viewer`](https://www.npmjs.com/package/lm-speed-viewer):
+
+```sh
+npm install --global lm-speed-viewer
+lm-speed-viewer
+```
+
+The npm launcher requires Python 3.10+ and creates an isolated environment at
+`~/.lm-speed-viewer/venvs/<version>` the first time it runs. Set
+`LM_SPEED_VIEWER_VENV` to store that environment elsewhere.
+
 ## Run
 
 ```sh
@@ -67,6 +81,30 @@ python app.py
 ```
 
 Then open: **http://127.0.0.1:8765**
+
+## Versioning and npm publishing
+
+Keep the Python and npm distributions on the same version by using one of the
+following commands. They update both `pyproject.toml` and `package.json`; commit
+the resulting files with the change.
+
+```sh
+npm run version:minor    # trivial changes: 0.2.0 -> 0.3.0
+npm run version:major    # new functions: 0.2.0 -> 1.0.0
+npm run version:release  # explicit release only: 0.2.0 -> 0.2.1
+```
+
+After a versioned change is merged into `main`, the `Publish npm package`
+workflow runs the package, lint, and Python tests, then publishes only if the
+new version is not already on npm. Merges with no version increase skip
+publishing.
+
+Before the first automated release, configure npm trusted publishing for
+`lm-speed-viewer` with GitHub Actions: owner `AlexeyPlatkovsky`, repository
+`lmstats`, workflow `publish-npm.yml`, and allow `npm publish`. npm requires an
+initial package publication before trusted publishing can be configured; publish
+the first version manually with a short-lived npm token, then add the trusted
+publisher. No npm token is stored in this repository.
 
 ## History persistence
 
@@ -89,4 +127,5 @@ LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
   classified and may temporarily become the latest prediction.
 - The history graph stores predictions locally; clearing the SQLite file
   removes all historical data.
+- Predictions reporting more than 999 tok/s are ignored as implausible log outliers.
 - More than six models use calculated shades of the six base graph colors.
