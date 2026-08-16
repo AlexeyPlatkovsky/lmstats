@@ -8,6 +8,11 @@ LM Speed Viewer is a local FastAPI + SSE app in `app.py`. It passively runs
 `lms log stream --source model --filter output --stats --json`, keeps the latest
 completed prediction in memory, and serves `http://127.0.0.1:8765`.
 
+v0.2 adds SQLite persistence of all predictions and a historical speed graph
+UI. The database is located at `~/.lmstudio-speed-viewer/history.db` by default
+(overridable via `LM_SPEED_VIEWER_DB`). The app resolves `db.default_db_path()`
+at lifespan startup (not import time) so tests can monkeypatch it per-request.
+
 Never proxy, restart, configure, kill, or otherwise control LM Studio or `lms`.
 Tests must not affect those processes.
 
@@ -18,7 +23,7 @@ pip install -r requirements-dev.txt
 python app.py
 ruff check .
 pytest
-pytest --cov=app --cov-report=term-missing --cov-fail-under=95
+pytest --cov=app --cov=db --cov-report=term-missing --cov-fail-under=95
 ```
 
 ## Operating model

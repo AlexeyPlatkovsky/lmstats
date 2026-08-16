@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: "Check: ruff"
+        id: ruff
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ruff check . 2>&1 | tee /tmp/ruff.log
+
+      - name: "Check: pytest"
+        id: pytest
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pytest -v 2>&1 | tee /tmp/pytest.log
+
+      - name: "Check: coverage gate"
+        id: coverage
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pytest --cov=app --cov=db --cov-report=term-missing --cov-fail-under=95 -v 2>&1 | tee /tmp/coverage.log
+
+      - name: Aggregate results
+        id: aggregate
+        if: always()
+        run: |
+          python - "${{ steps.ruff.outcome }}" "${{ steps.pytest.outcome }}" "${{ steps.coverage.outcome }}" <<'PY'
+          import json, re, sys
+
+          outcomes = {"ruff": sys.argv[1], "pytest": sys.argv[2], "coverage": sys.argv[3]}
+          logs = {"ruff": "/tmp/ruff.log", "pytest": "/tmp/pytest.log", "coverage": "/tmp/coverage.log"}
+
+          results = {}
+          for name, status in outcomes.items():
+              if status == "success":
+                  entry = {"status": "passed"}
+              elif status == "skipped":
+                  entry = {"status": "skipped"}
+              else:
+                  entry = {"status": "failed"}
+              if name != "ruff" and entry["status"] == "passed":
+                  try:
+                      text = open(logs[name]).read()
+                  except OSError:
+                      text = ""
+                  passed = re.search(r"(\d+) passed", text)
+                  failed = re.search(r"(\d+) failed", text)
+                  entry["passed"] = int(passed.group(1)) if passed else 0
+                  entry["failed"] = int(failed.group(1)) if failed else 0
+              results[name] = entry
+
+          with open("/tmp/results.json", "w") as f:
+              json.dump(results, f)
+          PY
+
+      - name: Post CI report comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('/tmp/results.json', 'utf8'));
+            const marker = '<!-- lm-speed-viewer-ci-report -->';
+            const labels = { ruff: 'Ruff lint', pytest: 'Pytest', coverage: 'Coverage gate' };
+            const rows = Object.keys(results).map((name) => {
+              const r = results[name];
+              const status =
+                r.status === 'passed' ? '✅ passed'
+                : r.status === 'skipped' ? '⏭️ skipped'
+                : '❌ failed';
+              const tests = r.passed != null
+                ? `${r.passed} passed, ${r.failed} failed`
+                : '—';
+              return `| ${labels[name]} | ${status} | ${tests} |`;
+            }).join('\n');
+
+            const body = [
+              marker,
+              '## CI report',
+              '| Check | Result | Tests |',
+              '| --- | --- | --- |',
+              rows,
+              '',
+              '_Checks run one at a time; a failure does not block the others._',
+            ].join('\n');
+
+            const issue = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue,
+            });
+            for (const c of comments) {
+              if (c.body && c.body.includes(marker)) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue,
+              body,
+            });
+
+      - name: Fail job if any check failed
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, sys
+          results = json.load(open("/tmp/results.json"))
+          failed = [name for name, r in results.items() if r["status"] == "failed"]
+          if failed:
+              print(f"::error::Failed checks: {', '.join(failed)}")
+              sys.exit(1)
+          print("All checks passed")
+          PY

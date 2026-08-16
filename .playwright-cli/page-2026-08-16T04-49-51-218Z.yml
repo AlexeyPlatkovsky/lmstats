@@ -1,0 +1,43 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - heading "LM SPEED VIEWER" [level=1] [ref=e4]
+    - generic [ref=e5]: Connected
+  - generic [ref=e8]: 53.0tok/s
+  - generic [ref=e9]: qwen/qwen3.6-35b-a3b
+  - table [ref=e10]:
+    - rowgroup [ref=e11]:
+      - row [ref=e12]:
+        - cell "TTFT" [ref=e13]
+        - cell "0.3 s" [ref=e14]
+      - row [ref=e15]:
+        - cell "Prompt" [ref=e16]
+        - cell "46,807" [ref=e17]
+      - row [ref=e18]:
+        - cell "Output" [ref=e19]
+        - cell "78" [ref=e20]
+      - row [ref=e21]:
+        - cell "Total" [ref=e22]
+        - cell "46,885" [ref=e23]
+      - row [ref=e24]:
+        - cell "Generation time" [ref=e25]
+        - cell "1.5 s" [ref=e26]
+  - generic [ref=e27]:
+    - heading "GENERATION SPEED HISTORY" [level=2] [ref=e28]
+    - generic [ref=e29]:
+      - button "5m" [ref=e30] [cursor=pointer]
+      - button "1h" [pressed] [ref=e31] [cursor=pointer]
+      - button "24h" [ref=e32] [cursor=pointer]
+    - img [ref=e34]:
+      - generic [ref=e35]: 06:49
+      - generic [ref=e36]: 07:04
+      - generic [ref=e37]: 07:19
+      - generic [ref=e38]: 07:34
+      - generic [ref=e39]: 07:49
+      - generic [ref=e40]: "0.0"
+      - generic [ref=e41]: "30.0"
+      - generic [ref=e42]: "60.0"
+      - generic [ref=e43]: "90.0"
+    - generic [ref=e65]: qwen/qwen3.6-35b-a3b
+  - generic [ref=e68]:
+    - generic [ref=e69]: "Last update: 07:49:49"
+    - generic [ref=e70]: v0.2

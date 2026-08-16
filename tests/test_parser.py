@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app import parse_line  # noqa: E402
+from app import PREDICTION_TYPE, parse_line  # noqa: E402
 
 # Real event captured from `lms log stream --source model --filter output
 # --stats --json` in this environment (output text shortened).
@@ -92,3 +92,67 @@ def test_missing_optional_fields_do_not_crash():
     assert p["timeToFirstTokenSec"] is None
     assert p["modelIdentifier"] == "some-model"
     assert p["timestampMs"] is None
+
+
+def test_real_event_stop_reason_and_output():
+    # REAL_EVENT carries both; the parser must surface them (stage 6 group A)
+    p = parse_line(REAL_EVENT)
+    assert p is not None
+    assert p["stopReason"] == "eosFound"
+    assert p["output"] == "fixture output text"
+
+
+def test_synthetic_full_event():
+    line = json.dumps({
+        "timestamp": 1786744900000,
+        "data": {
+            "type": PREDICTION_TYPE,
+            "output": "hello world",
+            "stats": {
+                "stopReason": "maxTokens",
+                "tokensPerSecond": 12.5,
+                "timeToFirstTokenSec": 0.4,
+                "totalTimeSec": 2.1,
+                "promptTokensCount": 10,
+                "predictedTokensCount": 25,
+                "totalTokensCount": 35,
+            },
+            "modelIdentifier": "test-model",
+        },
+    }).encode()
+    p = parse_line(line)
+    assert p is not None
+    assert p["timestampMs"] == 1786744900000
+    assert p["stopReason"] == "maxTokens"
+    assert p["output"] == "hello world"
+
+
+def test_missing_new_optional_fields_are_none():
+    line = json.dumps({
+        "data": {
+            "type": PREDICTION_TYPE,
+            "stats": {"tokensPerSecond": 1.0},
+        },
+    }).encode()
+    p = parse_line(line)
+    assert p is not None  # still a valid prediction (speed present)
+    for key in ("modelIdentifier", "timestampMs", "stopReason", "output"):
+        assert p[key] is None
+
+
+def test_non_string_new_optional_fields_are_none():
+    line = json.dumps({
+        "timestamp": 1786744900000,
+        "data": {
+            "type": PREDICTION_TYPE,
+            "output": 123,
+            "stats": {"stopReason": ["maxTokens"]},
+            "modelIdentifier": 42,
+        },
+    }).encode()
+    p = parse_line(line)
+    assert p is not None
+    assert p["timestampMs"] == 1786744900000
+    assert p["stopReason"] is None  # list, not str -> None
+    assert p["output"] is None      # int, not str -> None
+    assert p["modelIdentifier"] is None  # non-str model -> None (v0.1 rule)

@@ -1,7 +1,8 @@
-# LM Speed Viewer v0.1
+# LM Speed Viewer v0.2
 
 A tiny local web app that shows the statistics of the **latest completed**
-LM Studio generation, with generation speed (tok/s) as the primary metric.
+LM Studio generation, with generation speed (tok/s) as the primary metric,
+plus a historical graph of past generations.
 
 It is a passive observer: it runs the `lms` CLI log stream as a child process
 and displays whatever LM Studio logs. It does not proxy, restart, or configure
@@ -15,6 +16,7 @@ LM Studio in any way.
 - Prompt / output / total token counts
 - Generation time
 - Collector status (Connected / Disconnected / Error / Waiting for first prediction)
+- Historical speed graph (5m / 1h / 24h ranges, stored in SQLite)
 
 ## Requirements
 
@@ -36,22 +38,25 @@ python app.py
 
 Then open: **http://127.0.0.1:8765**
 
-## Telemetry source
+## History persistence
 
-The app launches and continuously reads:
+v0.2 adds local storage of all completed predictions to a SQLite database
+located at `~/.lmstudio-speed-viewer/history.db` by default. The graph UI
+reads from this database via the `/api/history` endpoint.
+
+### Override location
+
+Set the `LM_SPEED_VIEWER_DB` environment variable to use a different path:
 
 ```sh
-lms log stream --source model --filter output --stats --json
+LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
 ```
 
-Malformed or unrelated lines are ignored safely. Only the latest valid
-completed prediction is kept in memory; each new one replaces it and pushes an
-update to open browser tabs over SSE (browsers reconnect automatically).
+### Limitations
 
-## Limitations (v0.1)
-
-- Only the **latest** generation is shown. History is intentionally not stored;
-  after an app restart the page shows "Waiting for first prediction" until a
-  new generation completes.
+- Only the **latest** generation is shown in the hero view.
 - Internal/housekeeping LM Studio requests (e.g. title generation) are not
   classified and may temporarily become the latest prediction.
+- The history graph stores predictions locally; clearing the SQLite file
+  removes all historical data.
+- More than six models on the graph wrap around the color palette.

@@ -1,0 +1,1826 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono%3Awght%40100..900&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      *, ::before, ::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      data-pencil-name="3. LM Speed Viewer - Terminal Telemetry"
+      style="align-items: flex-start; background-color: #030A05; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; height: 720px; justify-content: flex-start; overflow: hidden; padding: 16px; width: 1280px"
+    >
+      <div
+        data-pencil-name="Header"
+        style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 28px; justify-content: space-between; width: 100%"
+      >
+        <div
+          data-pencil-name="App Title"
+          style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+        >
+          LM Speed Viewer
+        </div>
+        <div
+          data-pencil-name="Status Bar"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: fit-content; justify-content: flex-start; width: fit-content"
+        >
+          <div
+            data-pencil-name="Status Dot"
+            style="background-color: #38FF14; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; height: 6px; width: 6px"
+          ></div>
+          <div
+            data-pencil-name="Status Text"
+            style='box-sizing: border-box; color: #38FF14; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+          >
+            LM Studio: CONNECTED
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="Time Controls"
+        style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 24px; justify-content: space-between; width: 100%"
+      >
+        <div
+          data-pencil-name="Range Segments"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 4px; height: fit-content; justify-content: flex-start; width: fit-content"
+        >
+          <div
+            data-pencil-name="1m Button"
+            style="align-items: flex-start; background-color: #071109; border-radius: 2px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 4px 12px; width: fit-content"
+          >
+            <div
+              data-pencil-name="1m"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              1m
+            </div>
+          </div>
+          <div
+            data-pencil-name="5m Button"
+            style="align-items: flex-start; background-color: #0B1A0D; border-radius: 2px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #38FF14; padding: 4px 12px; width: fit-content"
+          >
+            <div
+              data-pencil-name="5m"
+              style='box-sizing: border-box; color: #38FF14; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              5m
+            </div>
+          </div>
+          <div
+            data-pencil-name="1h Button"
+            style="align-items: flex-start; background-color: #071109; border-radius: 2px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 4px 12px; width: fit-content"
+          >
+            <div
+              data-pencil-name="1h"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              1h
+            </div>
+          </div>
+          <div
+            data-pencil-name="24h Button"
+            style="align-items: flex-start; background-color: #071109; border-radius: 2px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 4px 12px; width: fit-content"
+          >
+            <div
+              data-pencil-name="24h"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              24h
+            </div>
+          </div>
+          <div
+            data-pencil-name="Custom Button"
+            style="align-items: flex-start; background-color: #071109; border-radius: 2px; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 4px 12px; width: fit-content"
+          >
+            <div
+              data-pencil-name="Custom"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Custom
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Selected Range"
+          style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+        >
+          2026-08-14 23:45:00 → 2026-08-14 23:50:00
+        </div>
+        <div
+          data-pencil-name="Period Nav"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 12px; height: fit-content; justify-content: flex-start; width: fit-content"
+        >
+          <div
+            data-pencil-name="Previous"
+            style='box-sizing: border-box; color: #5b855b; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+          >
+            ‹ PREV
+          </div>
+          <div
+            data-pencil-name="Next"
+            style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+          >
+            NEXT ›
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="Bottom Row"
+        style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 16px; height: 280px; justify-content: space-between; width: 100%"
+      >
+        <div
+          data-pencil-name="Speedtester Panel"
+          style="align-items: flex-start; background-color: #071109; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 4px; height: 280px; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 12px; width: 390px"
+        >
+          <div
+            data-pencil-name="Big Speed Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 8px; height: 56px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Timestamp Top"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              2026-08-14 23:50:02
+            </div>
+            <div
+              data-pencil-name="Frame 1"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; height: 62px; justify-content: space-around; width: 180px"
+            >
+              <div
+                data-pencil-name="Big Speed"
+                style='box-sizing: border-box; color: #38FF14; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 52px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: 52px; text-align: left; white-space: nowrap'
+              >
+                15.3
+              </div>
+              <div
+                data-pencil-name="Unit"
+                style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                tok/s
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Divider"
+            style="background-color: #83c98c; box-sizing: border-box; flex-shrink: 0; height: 1px; width: 100%"
+          ></div>
+          <div
+            data-pencil-name="Model"
+            style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+          >
+            Qwen3.8-27B MLX
+          </div>
+          <div
+            data-pencil-name="TTFT Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="TTFT Label"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              TTFT
+            </div>
+            <div
+              data-pencil-name="TTFT Value"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              4.36 s
+            </div>
+          </div>
+          <div
+            data-pencil-name="Divider"
+            style="background-color: #83c98c; box-sizing: border-box; flex-shrink: 0; height: 1px; width: 100%"
+          ></div>
+          <div
+            data-pencil-name="Prompt Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Prompt Label"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Prompt
+            </div>
+            <div
+              data-pencil-name="Prompt Value"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              13,377
+            </div>
+          </div>
+          <div
+            data-pencil-name="Divider"
+            style="background-color: #83c98c; box-sizing: border-box; flex-shrink: 0; height: 1px; width: 100%"
+          ></div>
+          <div
+            data-pencil-name="Output Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Output Label"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Output
+            </div>
+            <div
+              data-pencil-name="Output Value"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              625
+            </div>
+          </div>
+          <div
+            data-pencil-name="Divider"
+            style="background-color: #83c98c; box-sizing: border-box; flex-shrink: 0; height: 1px; width: 100%"
+          ></div>
+          <div
+            data-pencil-name="Total Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Total Label"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Total
+            </div>
+            <div
+              data-pencil-name="Total Value"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              14,002
+            </div>
+          </div>
+          <div
+            data-pencil-name="Divider"
+            style="background-color: #83c98c; box-sizing: border-box; flex-shrink: 0; height: 1px; width: 100%"
+          ></div>
+          <div
+            data-pencil-name="Generation time Row"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Generation time Label"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Generation time
+            </div>
+            <div
+              data-pencil-name="Generation time Value"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              40.8 s
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Recent Generations Panel"
+          style="align-items: flex-start; background-color: #071109; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 4px; height: 280px; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 16px; width: 818px"
+        >
+          <div
+            data-pencil-name="Recent Header"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 20px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Title"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              &gt; RECENT GENERATIONS
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Header"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 20px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Header Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Header Time Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Time
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Recent Header Model Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Model
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Header Prompt Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                Prompt
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Header Output Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                Output
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Header tok/s Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                tok/s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Header TTFT Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                TTFT
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Recent Header Total Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                Total
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Recent Header Cache Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                Cache
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Header Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Header Type Text"
+                style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Type
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 1"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 1 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Time Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:49:21
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Model Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Prompt Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                13.3k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Output Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                625
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 tok/s Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                15.3
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 TTFT Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                4.36s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Total Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                40.8s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Cache Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                72%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 1 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 1 Type Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 2"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 2 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Time Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:48:04
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Model Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Gemma 4 26B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Prompt Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                8.1k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Output Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                412
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 tok/s Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                25.1
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 TTFT Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                2.71s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Total Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                16.4s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Cache Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                84%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 2 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 2 Type Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 3"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 3 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Time Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:47:32
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Model Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Prompt Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                6.4k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Output Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                310
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 tok/s Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                16.2
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 TTFT Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                3.95s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Total Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                19.1s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Cache Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                —
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 3 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Recent Row 3 Type Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 4"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 4 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:47:15
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Gemma 4 26B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                5.2k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                298
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                24.9
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                2.68s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                11.9s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                82%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 4 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 5"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 5 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:46:58
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                9.1k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                512
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                14.8
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                4.55s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                34.6s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                71%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 5 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 6"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 6 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:46:21
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                21.5k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                1.2k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                13.5
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                5.12s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                88.2s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                69%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 6 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 7"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 7 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:45:47
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Gemma 4 26B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                4.3k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                187
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                25.4
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                2.49s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                7.4s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                85%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 7 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+          <div
+            data-pencil-name="Recent Row 8"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+          >
+            <div
+              data-pencil-name="Recent Row 8 Time"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:45:12
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Model"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 200px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Prompt"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                7.8k
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Output"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                403
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 tok/s"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                15.6
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 TTFT"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                4.01s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Total"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                25.8s
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Cache"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 60px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+              >
+                74%
+              </div>
+            </div>
+            <div
+              data-pencil-name="Recent Row 8 Type"
+              style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+            >
+              <div
+                data-pencil-name="Text"
+                style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Normal
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="Chart Panel"
+        style="align-items: flex-start; background-color: #071109; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 8px; height: 240px; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 16px; width: 100%"
+      >
+        <div
+          data-pencil-name="Chart Header"
+          style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: space-between; width: 100%"
+        >
+          <div
+            data-pencil-name="Chart Title"
+            style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 14px; font-style: normal; font-weight: 600; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+          >
+            GENERATION SPEED
+          </div>
+          <div
+            data-pencil-name="Legend"
+            style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 4px; height: fit-content; justify-content: flex-start; width: fit-content"
+          >
+            <div
+              data-pencil-name="Qwen3.8-27B MLX Legend"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 4px; height: fit-content; justify-content: flex-start; width: fit-content"
+            >
+              <div
+                data-pencil-name="Swatch"
+                style="background-color: #38FF14; box-sizing: border-box; flex-shrink: 0; height: 2px; width: 10px"
+              ></div>
+              <div
+                data-pencil-name="Label"
+                style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Qwen3.8-27B MLX
+              </div>
+            </div>
+            <div
+              data-pencil-name="Gemma 4 26B Legend"
+              style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 4px; height: fit-content; justify-content: flex-start; width: fit-content"
+            >
+              <div
+                data-pencil-name="Swatch"
+                style="background-color: #E5B800; box-sizing: border-box; flex-shrink: 0; height: 2px; width: 10px"
+              ></div>
+              <div
+                data-pencil-name="Label"
+                style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                Gemma 4 26B
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Plot Wrapper"
+          style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 4px; height: 180px; justify-content: flex-start; width: 100%"
+        >
+          <div
+            data-pencil-name="Plot Area"
+            style="background-color: #030A05; box-sizing: border-box; flex: 1 1 0; height: 180px; position: relative"
+          >
+            <div
+              data-pencil-name="Grid 6"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 6px; width: 1100px; z-index: 0"
+            ></div>
+            <div
+              data-pencil-name="Grid 42"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 42px; width: 1100px; z-index: 1"
+            ></div>
+            <div
+              data-pencil-name="Grid 78"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 78px; width: 1100px; z-index: 2"
+            ></div>
+            <div
+              data-pencil-name="Grid 114"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 114px; width: 1100px; z-index: 3"
+            ></div>
+            <div
+              data-pencil-name="Grid 150"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 150px; width: 1100px; z-index: 4"
+            ></div>
+            <div
+              data-pencil-name="Grid 174"
+              style="background-color: #83c98c; box-sizing: border-box; height: 1px; left: 40px; position: absolute; top: 174px; width: 1100px; z-index: 5"
+            ></div>
+            <div
+              data-pencil-name="Y 0"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 6'
+            >
+              0
+            </div>
+            <div
+              data-pencil-name="Y 5"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 145px; white-space: nowrap; z-index: 7'
+            >
+              5
+            </div>
+            <div
+              data-pencil-name="Y 10"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 109px; white-space: nowrap; z-index: 8'
+            >
+              10
+            </div>
+            <div
+              data-pencil-name="Y 15"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 73px; white-space: nowrap; z-index: 9'
+            >
+              15
+            </div>
+            <div
+              data-pencil-name="Y 20"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 37px; white-space: nowrap; z-index: 10'
+            >
+              20
+            </div>
+            <div
+              data-pencil-name="Y 25"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 16px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 1px; white-space: nowrap; z-index: 11'
+            >
+              25
+            </div>
+            <div
+              data-pencil-name="X 23:45"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 40px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 12'
+            >
+              23:45
+            </div>
+            <div
+              data-pencil-name="X 23:46"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 240px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 13'
+            >
+              23:46
+            </div>
+            <div
+              data-pencil-name="X 23:47"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 440px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 14'
+            >
+              23:47
+            </div>
+            <div
+              data-pencil-name="X 23:48"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 640px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 15'
+            >
+              23:48
+            </div>
+            <div
+              data-pencil-name="X 23:49"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 840px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 16'
+            >
+              23:49
+            </div>
+            <div
+              data-pencil-name="X 23:50"
+              style='box-sizing: border-box; color: #5b855b; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; left: 1060px; letter-spacing: 0px; line-height: normal; position: absolute; text-align: left; top: 166px; white-space: nowrap; z-index: 17'
+            >
+              23:50
+            </div>
+            <svg
+              data-pencil-name="Qwen Line"
+              viewBox="0 0 1000 168"
+              preserveAspectRatio="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style="box-sizing: border-box; height: 168px; left: 40px; overflow: visible; position: absolute; top: 6px; width: 1100px; z-index: 18"
+            >
+              <path
+                d="M 0,100.80000000000001 L 80,95.2 L 160,92.4 L 240,98.00000000000001 L 320,84.00000000000001 L 400,86.80000000000001 L 480,78.4 L 560,75.60000000000001 L 640,81.2 L 720,72.80000000000001 L 800,70 L 880,64.4 L 1000,67.2"
+                fill="none"
+                stroke="#38FF14"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              ></path>
+            </svg>
+            <svg
+              data-pencil-name="Gemma Line"
+              viewBox="0 0 1000 168"
+              preserveAspectRatio="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style="box-sizing: border-box; height: 168px; left: 40px; overflow: visible; position: absolute; top: 6px; width: 1100px; z-index: 19"
+            >
+              <path
+                d="M 0,33.6 L 80,30.800000000000004 L 160,32.480000000000004 L 240,28.000000000000004 L 320,25.200000000000003 L 400,26.880000000000003 L 480,22.400000000000002 L 560,23.520000000000003 L 640,19.6 L 720,21.28 L 800,16.8 L 880,17.92 L 1000,15.680000000000001"
+                fill="none"
+                stroke="#E5B800"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              ></path>
+            </svg>
+            <div
+              data-pencil-name="Hover Point"
+              style="background-color: #38FF14; border-radius: 50%; box-sizing: border-box; height: 5px; left: 600px; position: absolute; top: 78.24px; width: 5px; z-index: 20"
+            ></div>
+            <div
+              data-pencil-name="Hover Line"
+              style="background-color: #83c98c; box-sizing: border-box; height: 168px; left: 602px; position: absolute; top: 6px; width: 1px; z-index: 21"
+            ></div>
+            <div
+              data-pencil-name="Tooltip"
+              style="align-items: flex-start; background-color: #071109; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; height: fit-content; justify-content: flex-start; left: 612px; outline-offset: -0.5px; outline: 1px solid #E5B800; padding: 4px; position: absolute; top: 18px; width: 260px; z-index: 22"
+            >
+              <div
+                data-pencil-name="Tooltip Time"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+              >
+                23:47:12
+              </div>
+              <div
+                data-pencil-name="Tooltip Model Row"
+                style="align-items: center; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: space-between; width: 100%"
+              >
+                <div
+                  data-pencil-name="Tooltip Model"
+                  style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+                >
+                  Qwen3.8-27B MLX
+                </div>
+                <div
+                  data-pencil-name="Tooltip Speed"
+                  style='box-sizing: border-box; color: #38FF14; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+                >
+                  15.3 tok/s
+                </div>
+              </div>
+              <div
+                data-pencil-name="Tooltip Metrics"
+                style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: 12px; text-align: left; width: 240px'
+              >
+                Prompt: 13,377&nbsp;&nbsp;Output: 625
+                <br />
+                TTFT: 4.36s&nbsp;&nbsp;Cache: 72%&nbsp;&nbsp;Req: 3
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        data-pencil-name="Model Summary Panel"
+        style="align-items: flex-start; background-color: #071109; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: 80px; justify-content: flex-start; outline-offset: -0.5px; outline: 1px solid #83c98c; padding: 4px; width: 100%"
+      >
+        <div
+          data-pencil-name="Summary Header"
+          style="align-items: center; background-color: #0B1A0D; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 20px; justify-content: space-between; width: 100%"
+        >
+          <div
+            data-pencil-name="Summary Header Model"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 240px"
+          >
+            <div
+              data-pencil-name="Summary Header Model Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "Geist Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Model
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Req"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Summary Header Req Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Req
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Avg"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Summary Header Avg Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Avg
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Med"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Summary Header Med Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Med
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Min"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Summary Header Min Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Min
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Max"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Summary Header Max Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Max
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header TTFT"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Summary Header TTFT Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              TTFT
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Prompt"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Summary Header Prompt Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Prompt
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Output"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Summary Header Output Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Output
+            </div>
+          </div>
+          <div
+            data-pencil-name="Summary Header Cache"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Summary Header Cache Text"
+              style='box-sizing: border-box; color: #569b56; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 9px; font-style: normal; font-weight: 500; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              Cache
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Qwen Summary"
+          style="align-items: center; background-color: #00000000; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+        >
+          <div
+            data-pencil-name="Qwen Summary Model"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 240px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Model Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Qwen3.8-27B MLX
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Req"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Req Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              42
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Avg"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Avg Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              15.2
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Med"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Med Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              15.5
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Min"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Min Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              11.3
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Max"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Max Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              16.4
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary TTFT"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Qwen Summary TTFT Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              4.2s
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Prompt"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Prompt Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              356k
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Output"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Output Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              18.4k
+            </div>
+          </div>
+          <div
+            data-pencil-name="Qwen Summary Cache"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Qwen Summary Cache Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              68%
+            </div>
+          </div>
+        </div>
+        <div
+          data-pencil-name="Gemma Summary"
+          style="align-items: center; background-color: #00000000; box-sizing: border-box; display: flex; flex-direction: row; flex-shrink: 0; gap: 0px; height: 22px; justify-content: space-between; width: 100%"
+        >
+          <div
+            data-pencil-name="Gemma Summary Model"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 240px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Model Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "Geist Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: left; white-space: nowrap'
+            >
+              Gemma 4 26B
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Req"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Req Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              18
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Avg"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Avg Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              24.8
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Med"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Med Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              25.1
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Min"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Min Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              21.9
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Max"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 70px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Max Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              26.2
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary TTFT"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 90px"
+          >
+            <div
+              data-pencil-name="Gemma Summary TTFT Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              2.8s
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Prompt"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Prompt Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              121k
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Output"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 110px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Output Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              9.3k
+            </div>
+          </div>
+          <div
+            data-pencil-name="Gemma Summary Cache"
+            style="align-items: flex-start; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; gap: 0px; height: fit-content; justify-content: center; width: 80px"
+          >
+            <div
+              data-pencil-name="Gemma Summary Cache Text"
+              style='box-sizing: border-box; color: #C7E8C8; font-family: "IBM Plex Mono", system-ui, sans-serif; font-size: 11px; font-style: normal; font-weight: 400; letter-spacing: 0px; line-height: normal; text-align: right; white-space: nowrap'
+            >
+              81%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

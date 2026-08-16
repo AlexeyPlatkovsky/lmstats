@@ -12,10 +12,14 @@ import asyncio
 import json
 import os
 import shutil
-from contextlib import asynccontextmanager
+import sys
+from contextlib import asynccontextmanager, closing
+from datetime import datetime, timezone
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+
+import db
 
 HOST = "127.0.0.1"
 PORT = 8765
@@ -58,6 +62,8 @@ def parse_line(line):
 
     model = data.get("modelIdentifier")
     ts = obj.get("timestamp")
+    stop_reason = stats.get("stopReason")
+    output = data.get("output")
     return {
         "modelIdentifier": model if isinstance(model, str) and model else None,
         "tokensPerSecond": num("tokensPerSecond"),
@@ -67,17 +73,20 @@ def parse_line(line):
         "predictedTokensCount": num("predictedTokensCount"),
         "totalTokensCount": num("totalTokensCount"),
         "timestampMs": ts if isinstance(ts, (int, float)) and not isinstance(ts, bool) else None,
+        "stopReason": stop_reason if isinstance(stop_reason, str) else None,
+        "output": output if isinstance(output, str) else None,
     }
 
 
 class Collector:
     """Runs the lms log stream subprocess and tracks the latest prediction."""
 
-    def __init__(self):
+    def __init__(self, db_path=None):
         self.status = "starting"  # starting | connected | disconnected | error
         self.detail = ""
         self.prediction = None
         self.proc = None
+        self.db_path = db_path  # SQLite path; None disables persistence
         self._stopping = False
         self.subscribers = set()  # one asyncio.Queue per SSE client
 
@@ -130,12 +139,22 @@ class Collector:
             pred = parse_line(line.decode("utf-8", "replace"))
             if pred is not None:
                 self.prediction = pred
+                self._persist(pred, line)
                 self.publish()
         rc = await proc.wait()
         if not self._stopping and self.status == "connected":
             self.status = "disconnected"
             self.detail = f"lms log stream exited (code {rc})"
         self.publish()
+
+    def _persist(self, pred, raw_line):
+        if self.db_path is None:
+            return
+        try:
+            with closing(db.connect(self.db_path)) as conn:
+                db.insert_prediction(conn, pred, raw_line.decode("utf-8", "replace"))
+        except Exception:  # persistence failure must not break live view
+            print(f"failed to persist prediction: {sys.exc_info()[1]}", file=sys.stderr)
 
     async def _drain_stderr(self, proc):
         tail = []
@@ -164,8 +183,21 @@ class Collector:
 collector = Collector()
 
 
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 @asynccontextmanager
 async def lifespan(app):
+    # Resolve the path at startup (never at import time) so tests can monkeypatch it.
+    db_path = db.default_db_path()
+    try:
+        db.init_db(db_path)
+        with closing(db.connect(db_path)) as conn:
+            collector.prediction = db.latest_prediction(conn)
+        collector.db_path = db_path
+    except Exception as exc:  # persistence must never break the live view
+        print(f"history database unavailable: {exc}", file=sys.stderr)
     await collector.start()
     yield
     await collector.stop()
@@ -175,13 +207,31 @@ app = FastAPI(title="LM Speed Viewer", lifespan=lifespan)
 
 
 @app.get("/")
-async def index():
-    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+async def index(response: Response):
+    resp = FileResponse(os.path.join(STATIC_DIR, "index.html"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 
 @app.get("/api/state")
 async def api_state():
     return JSONResponse(collector.snapshot())
+
+
+@app.get("/api/history")
+async def api_history(range: str = ""):
+    if range == "":
+        range_key = "1h"  # omitted or empty -> default
+    elif range in db.RANGE_DURATIONS:
+        range_key = range
+    else:
+        return JSONResponse(
+            {"error": "invalid range; expected one of: 5m, 1h, 24h"}, status_code=400)
+    # Resolved per request (never at import time) so tests can monkeypatch it.
+    path = db.default_db_path()
+    return JSONResponse(db.get_history(path, range_key, now=_utcnow()))
 
 
 @app.get("/events")
