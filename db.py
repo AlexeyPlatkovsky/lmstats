@@ -10,6 +10,7 @@ import os
 import sqlite3
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from statistics import median
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS predictions (
@@ -127,8 +128,9 @@ def latest_prediction(conn: sqlite3.Connection) -> dict | None:
     return row_to_prediction(row) if row is not None else None
 
 
-RANGE_DURATIONS = {"5m": 300, "1h": 3600, "24h": 86400}   # seconds
-BUCKET_SIZES = {"5m": 30, "1h": 60, "24h": 900}           # seconds
+RANGE_DURATIONS = {"5m": 300, "15m": 900, "1h": 3600, "24h": 86400}  # seconds
+BUCKET_SIZES = {"5m": 30, "15m": 60, "1h": 60, "24h": 900}            # seconds
+MAX_DASHBOARD_WINDOW = timedelta(days=7)
 
 
 def get_history(path: str, range_key: str, now: datetime) -> dict:
@@ -177,4 +179,89 @@ def get_history(path: str, range_key: str, now: datetime) -> dict:
         "range": range_key,
         "generatedAt": format_datetime(now),
         "series": ordered,
+    }
+
+
+def get_dashboard(
+    path: str, start: datetime, end: datetime, range_key: str,
+) -> dict:
+    """Return the raw-window dashboard data without storing derived values."""
+    start_text = format_datetime(start)
+    end_text = format_datetime(end)
+    custom_bucket = max(10, int((end - start).total_seconds() / 120))
+    bucket_ms = BUCKET_SIZES.get(range_key, custom_bucket) * 1000
+
+    with closing(connect(path)) as conn:
+        rows = conn.execute(
+            "SELECT * FROM predictions WHERE timestamp >= ? AND timestamp <= ?"
+            " ORDER BY timestamp DESC, id DESC",
+            (start_text, end_text),
+        ).fetchall()
+        recent_rows = conn.execute(
+            "SELECT * FROM predictions ORDER BY timestamp DESC, id DESC LIMIT 8"
+        ).fetchall()
+
+    recent = [row_to_prediction(row) for row in recent_rows]
+    by_model: dict = {}
+    buckets: dict[tuple, list] = {}
+    for row in rows:
+        model = row["model"]
+        values = by_model.setdefault(model, {
+            "requests": 0, "speeds": [], "ttfts": [], "prompt": 0, "output": 0,
+        })
+        values["requests"] += 1
+        if row["tokens_per_second"] is not None:
+            values["speeds"].append(row["tokens_per_second"])
+        if row["time_to_first_token_seconds"] is not None:
+            values["ttfts"].append(row["time_to_first_token_seconds"])
+        values["prompt"] += row["prompt_tokens"] or 0
+        values["output"] += row["output_tokens"] or 0
+
+        bucket_start = _timestamp_ms(row["timestamp"]) // bucket_ms * bucket_ms
+        bucket = buckets.setdefault((model, bucket_start), [0, 0.0, 0])
+        bucket[0] += 1
+        if row["tokens_per_second"] is not None:
+            bucket[1] += row["tokens_per_second"]
+            bucket[2] += 1
+
+    ordered_models = sorted(by_model, key=lambda model: (model is None, model or ""))
+    summary = []
+    for model in ordered_models:
+        values = by_model[model]
+        speeds = values["speeds"]
+        ttfts = values["ttfts"]
+        summary.append({
+            "model": model,
+            "requests": values["requests"],
+            "avgTokensPerSecond": round(sum(speeds) / len(speeds), 2) if speeds else None,
+            "medianTokensPerSecond": round(median(speeds), 2) if speeds else None,
+            "minTokensPerSecond": round(min(speeds), 2) if speeds else None,
+            "maxTokensPerSecond": round(max(speeds), 2) if speeds else None,
+            "avgTimeToFirstTokenSec": round(sum(ttfts) / len(ttfts), 2) if ttfts else None,
+            "promptTokens": values["prompt"],
+            "outputTokens": values["output"],
+        })
+
+    series: dict = {}
+    for (model, bucket_start), (count, speed_sum, speed_n) in buckets.items():
+        series.setdefault(model, []).append({
+            "timestamp": format_timestamp(bucket_start),
+            "avgTokensPerSecond": round(speed_sum / speed_n, 2) if speed_n else None,
+            "count": count,
+        })
+    history = {
+        "range": range_key,
+        "generatedAt": end_text,
+        "series": [
+            {"model": model, "points": sorted(series[model], key=lambda point: point["timestamp"])}
+            for model in sorted(series, key=lambda model: (model is None, model or ""))
+        ],
+    }
+    return {
+        "range": range_key,
+        "start": start_text,
+        "end": end_text,
+        "history": history,
+        "recent": recent,
+        "summary": summary,
     }

@@ -36,6 +36,17 @@ def test_range_5m(db_path, seed, now):
     assert all(pt["count"] == 1 for pt in points)
 
 
+def test_range_15m(db_path, seed, now):
+    _init(db_path)
+    p = {"modelIdentifier": "m", "tokensPerSecond": 10.0}
+    seed(p, ts_offset_s=-14 * 60)
+    seed(p, ts_offset_s=-16 * 60)
+    body = db.get_history(db_path, "15m", now=now)
+    assert [pt["timestamp"] for pt in body["series"][0]["points"]] == [
+        "2026-08-15T10:16:00.000Z",
+    ]
+
+
 def test_range_1h(db_path, seed, now):
     _init(db_path)
     p = {"modelIdentifier": "m", "tokensPerSecond": 10.0}

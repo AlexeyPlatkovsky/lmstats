@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import sys
+from datetime import timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -12,6 +13,11 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 import app as app_module  # noqa: E402
 from starlette.requests import Request  # noqa: E402
+
+
+def test_utcnow_is_timezone_aware_utc():
+    """History windows must use an aware UTC clock when not overridden by tests."""
+    assert app_module._utcnow().tzinfo is timezone.utc
 
 
 @pytest.fixture()
@@ -62,6 +68,13 @@ def test_history_5m(client, seed, sample_prediction):
     }]
 
 
+def test_history_15m(client, seed, sample_prediction):
+    seed(sample_prediction)
+    r = client.get("/api/history?range=15m")
+    assert r.status_code == 200
+    assert r.json()["range"] == "15m"
+
+
 def test_history_1h(client, seed, sample_prediction):
     seed(sample_prediction)
     r = client.get("/api/history?range=1h")
@@ -91,11 +104,67 @@ def test_history_24h(client, seed, sample_prediction):
 def test_history_invalid_range(client):
     r = client.get("/api/history?range=10m")
     assert r.status_code == 400
-    assert r.json() == {"error": "invalid range; expected one of: 5m, 1h, 24h"}
+    assert r.json() == {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"}
     # empty range behaves as the default 1h
     r = client.get("/api/history?range=")
     assert r.status_code == 200
     assert r.json()["range"] == "1h"
+
+
+def test_history_rejects_removed_1m_range(client):
+    r = client.get("/api/history?range=1m")
+    assert r.status_code == 400
+
+
+def test_dashboard_returns_recent_history_and_summary(client, seed):
+    seed({"modelIdentifier": "older", "tokensPerSecond": 5.0}, ts_offset_s=-2 * 3600)
+    seed({"modelIdentifier": "alpha", "tokensPerSecond": 10.0,
+          "promptTokensCount": 100, "predictedTokensCount": 25,
+          "timeToFirstTokenSec": 1.5, "totalTimeSec": 4.0}, ts_offset_s=-30)
+    seed({"modelIdentifier": "alpha", "tokensPerSecond": 20.0,
+          "promptTokensCount": 200, "predictedTokensCount": 50,
+          "timeToFirstTokenSec": 2.5, "totalTimeSec": 6.0})
+
+    r = client.get("/api/dashboard?range=1h")
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["range"] == "1h"
+    assert body["start"] == "2026-08-15T09:30:00.000Z"
+    assert body["end"] == "2026-08-15T10:30:00.000Z"
+    assert [item["tokensPerSecond"] for item in body["recent"]] == [20.0, 10.0, 5.0]
+    assert body["summary"] == [{
+        "model": "alpha", "requests": 2, "avgTokensPerSecond": 15.0,
+        "medianTokensPerSecond": 15.0, "minTokensPerSecond": 10.0,
+        "maxTokensPerSecond": 20.0, "avgTimeToFirstTokenSec": 2.0,
+        "promptTokens": 300, "outputTokens": 75,
+    }]
+    assert body["history"]["range"] == "1h"
+
+
+def test_dashboard_accepts_custom_window_up_to_seven_days(client, seed, now):
+    seed({"modelIdentifier": "alpha", "tokensPerSecond": 10.0}, ts_offset_s=-2 * 3600)
+    start = "2026-08-15T08:30:00.000Z"
+    end = "2026-08-15T10:30:00.000Z"
+    r = client.get(f"/api/dashboard?start={start}&end={end}")
+
+    assert r.status_code == 200
+    assert r.json()["range"] == "custom"
+    assert r.json()["start"] == start
+    assert len(r.json()["recent"]) == 1
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "start=2026-08-01T10:30:00.000Z&end=2026-08-15T10:30:00.000Z",
+        "start=2026-08-15T10:30:00.000Z",
+        "end=2026-08-15T10:30:00.000Z",
+    ],
+)
+def test_dashboard_rejects_invalid_custom_windows(client, query):
+    r = client.get("/api/dashboard?" + query)
+    assert r.status_code == 400
 
 
 def test_history_empty(client):

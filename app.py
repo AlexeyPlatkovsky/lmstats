@@ -14,7 +14,7 @@ import os
 import shutil
 import sys
 from contextlib import asynccontextmanager, closing
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
@@ -228,10 +228,62 @@ async def api_history(range: str = ""):
         range_key = range
     else:
         return JSONResponse(
-            {"error": "invalid range; expected one of: 5m, 1h, 24h"}, status_code=400)
+            {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"}, status_code=400)
     # Resolved per request (never at import time) so tests can monkeypatch it.
     path = db.default_db_path()
     return JSONResponse(db.get_history(path, range_key, now=_utcnow()))
+
+
+def _parse_utc(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("timestamp must include a timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+@app.get("/api/dashboard")
+async def api_dashboard(
+    range: str = "1h", start: str = "", end: str = "", at: str = "",
+):
+    """Dashboard data for a fixed range or a user-selected window up to seven days."""
+    now = _utcnow()
+    if bool(start) != bool(end) or (at and (start or end)):
+        return JSONResponse(
+            {"error": "start and end must be provided together"}, status_code=400)
+    if start and end:
+        try:
+            window_start = _parse_utc(start)
+            window_end = _parse_utc(end)
+        except ValueError:
+            return JSONResponse({"error": "invalid ISO-8601 timestamp"}, status_code=400)
+        if window_end <= window_start:
+            return JSONResponse({"error": "end must be after start"}, status_code=400)
+        if window_end - window_start > db.MAX_DASHBOARD_WINDOW:
+            return JSONResponse({"error": "custom range cannot exceed seven days"}, status_code=400)
+        if window_end > now:
+            return JSONResponse({"error": "end cannot be in the future"}, status_code=400)
+        range_key = "custom"
+    else:
+        range_key = range or "1h"
+        if range_key not in db.RANGE_DURATIONS:
+            return JSONResponse(
+                {"error": "invalid range; expected one of: 5m, 15m, 1h, 24h"},
+                status_code=400,
+            )
+        if at:
+            try:
+                window_end = _parse_utc(at)
+            except ValueError:
+                return JSONResponse({"error": "invalid ISO-8601 timestamp"}, status_code=400)
+            if window_end > now:
+                return JSONResponse({"error": "end cannot be in the future"}, status_code=400)
+        else:
+            window_end = now
+        window_start = now - timedelta(seconds=db.RANGE_DURATIONS[range_key])
+        if at:
+            window_start = window_end - timedelta(seconds=db.RANGE_DURATIONS[range_key])
+    path = db.default_db_path()
+    return JSONResponse(db.get_dashboard(path, window_start, window_end, range_key))
 
 
 @app.get("/events")

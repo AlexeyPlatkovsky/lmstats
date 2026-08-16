@@ -16,7 +16,8 @@ LM Studio in any way.
 - Prompt / output / total token counts
 - Generation time
 - Collector status (Connected / Disconnected / Error / Waiting for first prediction)
-- Historical speed graph (5m / 1h / 24h ranges, stored in SQLite)
+- Historical speed graph (5m / 15m / 1h / 24h ranges, stored in SQLite)
+- The eight most recent generations, regardless of the selected graph range
 
 ## Requirements
 

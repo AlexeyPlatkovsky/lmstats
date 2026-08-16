@@ -8,3 +8,7 @@ select = ["E", "F"]
 [tool.pytest.ini_options]
 # Make the root-level `app` module importable in tests and resolvable by pytest-cov.
 pythonpath = ["."]
+addopts = "-m 'not browser'"
+markers = [
+    "browser: executes the shipped frontend in Chromium; run separately with -m browser",
+]
