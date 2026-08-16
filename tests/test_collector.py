@@ -10,8 +10,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import db  # noqa: E402
 
-import app as app_module  # noqa: E402
-from app import Collector, PREDICTION_TYPE  # noqa: E402
+from lm_speed_viewer import collector as collector_module  # noqa: E402
+from lm_speed_viewer.collector import Collector  # noqa: E402
+from lm_speed_viewer.parser import PREDICTION_TYPE  # noqa: E402
 
 PREDICTION_LINE = json.dumps({
     "timestamp": 1786744778242,
@@ -26,6 +27,15 @@ PREDICTION_LINE = json.dumps({
 OTHER_EVENT_LINE = json.dumps({
     "timestamp": 2,
     "data": {"type": "llm.prediction.input", "input": "x"},
+}).encode()
+
+OUTLIER_PREDICTION_LINE = json.dumps({
+    "timestamp": 1786744778242,
+    "data": {
+        "type": PREDICTION_TYPE,
+        "stats": {"tokensPerSecond": 1000.0},
+        "modelIdentifier": "impossible-model",
+    },
 }).encode()
 
 
@@ -106,7 +116,7 @@ def test_publish_ignores_full_queue():
 
 
 def test_start_when_lms_not_found(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", [])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", [])
 
     async def scenario():
         c = Collector()
@@ -123,7 +133,7 @@ def test_start_when_lms_not_found(monkeypatch):
 
 
 def test_start_when_spawn_fails(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", ["/fake/lms"])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", ["/fake/lms"])
 
     async def fake_exec(*args, **kwargs):
         raise OSError("boom")
@@ -140,7 +150,7 @@ def test_start_when_spawn_fails(monkeypatch):
 
 
 def test_start_success(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", ["/fake/lms"])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", ["/fake/lms"])
     proc = FakeProc(stdout_lines=(), stdout_block_on_eof=True)  # stream stays open
 
     async def fake_exec(*args, **kwargs):
@@ -300,6 +310,23 @@ def test_persist_inserts_each_prediction(tmp_path):
     assert len(rows) == 1
     assert rows[0]["model"] == "test-model"
     assert rows[0]["tokens_per_second"] == 12.5
+
+
+def test_outlier_rate_does_not_update_or_persist(tmp_path):
+    path = str(tmp_path / "history.db")
+    db.init_db(path)
+
+    async def scenario():
+        collector = Collector(db_path=path)
+        collector.proc = FakeProc(stdout_lines=[OUTLIER_PREDICTION_LINE])
+        await collector._run()
+        assert collector.prediction is None
+
+    run(scenario())
+
+    with db.connect(path) as conn:
+        count = conn.execute("SELECT COUNT(*) FROM predictions").fetchone()[0]
+    assert count == 0
 
 
 def test_persist_failure_does_not_break_live_view(tmp_path, monkeypatch, capsys):

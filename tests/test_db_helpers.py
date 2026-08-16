@@ -6,15 +6,11 @@ that were previously only covered indirectly through integration tests.
 Run:  pytest tests/test_db_helpers.py -v
 """
 
-import asyncio
-import json
 import os
 import sys
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-import pytest  # noqa: E402
 
 import db  # noqa: E402
 
@@ -83,7 +79,12 @@ def test_collector_stderr_tail():
 
     # Simulate a process with stderr output
     result = subprocess.run(
-        ["sh", "-c", "echo 'line1' >&2 && echo 'line2' >&2 && echo 'line3' >&2 && echo 'line4' >&2 && echo 'line5' >&2 && echo 'line6' >&2"],
+        [
+            "sh",
+            "-c",
+            "echo 'line1' >&2 && echo 'line2' >&2 && echo 'line3' >&2 "
+            "&& echo 'line4' >&2 && echo 'line5' >&2 && echo 'line6' >&2",
+        ],
         capture_output=True,
         text=True,
     )

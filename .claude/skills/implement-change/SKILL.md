@@ -10,8 +10,10 @@ description: Implements a scoped LM Speed Viewer code or documentation change af
 2. Restate the observable behavior and acceptance criteria. Stop for an
    unapproved API/SSE contract, persistence migration, dependency, security,
    or LM Studio-control change.
-3. Implement the smallest complete change. Keep parser, collection, HTTP, and
-   browser concerns separate; preserve malformed-input handling.
+3. Confirm the focused test was written and failed before implementation, or
+   record the justified exception. Implement the smallest complete change.
+   Keep parser, collection, HTTP, and browser concerns separate; preserve
+   malformed-input handling.
 4. Add no speculative abstractions or unrelated cleanup.
 5. Run focused checks after edits and inspect the diff for accidental churn.
 6. Update README or task documentation only when facts the user sees changed.

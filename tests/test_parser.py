@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app import PREDICTION_TYPE, parse_line  # noqa: E402
+from lm_speed_viewer.parser import PREDICTION_TYPE, parse_line  # noqa: E402
 
 # Real event captured from `lms log stream --source model --filter output
 # --stats --json` in this environment (output text shortened).
@@ -156,3 +156,21 @@ def test_non_string_new_optional_fields_are_none():
     assert p["stopReason"] is None  # list, not str -> None
     assert p["output"] is None      # int, not str -> None
     assert p["modelIdentifier"] is None  # non-str model -> None (v0.1 rule)
+
+
+def test_prediction_rate_above_999_is_ignored():
+    accepted = json.dumps({
+        "data": {
+            "type": PREDICTION_TYPE,
+            "stats": {"tokensPerSecond": 999.0},
+        },
+    })
+    line = json.dumps({
+        "data": {
+            "type": PREDICTION_TYPE,
+            "stats": {"tokensPerSecond": 1000.0},
+        },
+    })
+
+    assert parse_line(accepted)["tokensPerSecond"] == 999.0
+    assert parse_line(line) is None

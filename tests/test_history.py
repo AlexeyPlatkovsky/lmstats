@@ -36,6 +36,17 @@ def test_range_5m(db_path, seed, now):
     assert all(pt["count"] == 1 for pt in points)
 
 
+def test_range_15m(db_path, seed, now):
+    _init(db_path)
+    p = {"modelIdentifier": "m", "tokensPerSecond": 10.0}
+    seed(p, ts_offset_s=-14 * 60)
+    seed(p, ts_offset_s=-16 * 60)
+    body = db.get_history(db_path, "15m", now=now)
+    assert [pt["timestamp"] for pt in body["series"][0]["points"]] == [
+        "2026-08-15T10:16:00.000Z",
+    ]
+
+
 def test_range_1h(db_path, seed, now):
     _init(db_path)
     p = {"modelIdentifier": "m", "tokensPerSecond": 10.0}
@@ -168,3 +179,28 @@ def test_deterministic_ordering(db_path, seed, now):
         "2026-08-15T10:28:00.000Z",
         "2026-08-15T10:29:00.000Z",
     ]
+
+
+def test_monthly_dashboard_keeps_the_last_ten_numeric_values_per_model(db_path, seed, now):
+    _init(db_path)
+    for index in range(12):
+        seed(
+            {"modelIdentifier": "alpha", "tokensPerSecond": float(index)},
+            ts_offset_s=-(12 - index) * 60,
+        )
+    seed({"modelIdentifier": "beta", "tokensPerSecond": 20.0}, ts_offset_s=-120)
+    seed({"modelIdentifier": "beta", "tokensPerSecond": None}, ts_offset_s=-60)
+    seed({"modelIdentifier": "older", "tokensPerSecond": 99.0}, ts_offset_s=-31 * 86400)
+
+    body = db.get_dashboard(db_path, now - timedelta(days=30), now, "1mo")
+
+    assert body["history"]["range"] == "1mo"
+    assert [series["model"] for series in body["history"]["series"]] == ["alpha", "beta"]
+    alpha, beta = body["history"]["series"]
+    assert [point["avgTokensPerSecond"] for point in alpha["points"]] == list(range(2, 12))
+    assert [point["avgTokensPerSecond"] for point in beta["points"]] == [20.0]
+    assert all(
+        point["count"] == 1
+        for series in body["history"]["series"]
+        for point in series["points"]
+    )

@@ -41,8 +41,9 @@ explicit tracking operation. Do not create task items automatically.
 
 - Standard/major work: prepare a branch with `work-with-git` if the user asks
   for branch discipline or a TaskPilot item is supplied.
-- Behavior changes: tests before implementation where practical; always run
-  validation afterward.
+- Significant features, bug fixes, and refactors: TDD is primary. Require a
+  focused failing test before implementation, unless the agent records why a
+  meaningful automated test cannot be written first; always run validation.
 - UI: browser verification is required when automation is available.
 - Every non-trivial implementation: independent code review after validation.
 - Keep documentation current when commands, behavior, limitations, or project

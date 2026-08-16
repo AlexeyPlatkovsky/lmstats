@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const packageData = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
+
+test("npm package exposes the Python CLI", () => {
+  assert.equal(packageData.name, "lm-speed-viewer");
+  assert.equal(packageData.type, "module");
+  assert.deepEqual(packageData.bin, { "lm-speed-viewer": "bin/lm-speed-viewer.js" });
+});
+
+test("npm package contains source files but not local Python bytecode", () => {
+  assert.deepEqual(packageData.files, [
+    "bin/",
+    "lm_speed_viewer/*.py",
+    "lm_speed_viewer/static/*",
+    "app.py",
+    "db.py",
+    "pyproject.toml",
+    "requirements.txt",
+    "README.md",
+    "LICENSE",
+  ]);
+});
+
+test("npm package and Python distribution use the same version", async () => {
+  const pyproject = await readFile(new URL("../../pyproject.toml", import.meta.url), "utf8");
+
+  assert.match(pyproject, new RegExp(`^version = "${packageData.version}"$`, "m"));
+});

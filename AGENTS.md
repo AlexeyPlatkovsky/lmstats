@@ -13,8 +13,11 @@ UI. The database is located at `~/.lmstudio-speed-viewer/history.db` by default
 (overridable via `LM_SPEED_VIEWER_DB`). The app resolves `db.default_db_path()`
 at lifespan startup (not import time) so tests can monkeypatch it per-request.
 
-Never proxy, restart, configure, kill, or otherwise control LM Studio or `lms`.
-Tests must not affect those processes.
+Agents may start and stop `python app.py` for local verification. The viewer's
+normal passive log-stream lifecycle is permitted. Never directly proxy,
+restart, configure, kill, or otherwise control LM Studio or `lms`, including
+independently managing the viewer's `lms` child process. Automated tests must
+not affect those processes.
 
 ## Commands
 
@@ -23,7 +26,7 @@ pip install -r requirements-dev.txt
 python app.py
 ruff check .
 pytest
-pytest --cov=app --cov=db --cov-report=term-missing --cov-fail-under=95
+pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
 ```
 
 ## Operating model
@@ -33,8 +36,11 @@ pytest --cov=app --cov=db --cov-report=term-missing --cov-fail-under=95
    coordinated steps.
 2. Before non-trivial work, read `.claude/skills/manager/SKILL.md` and follow
    its selected route. Do not bypass the manager or invent a parallel workflow.
-3. For a small localized fix, inspect the affected code and tests, use TDD where
-   practical, and run focused checks. For bugs, add a regression test first.
+3. TDD is the primary approach for every significant feature, bug fix, or
+   refactor: first add a focused test that fails for the intended behavior,
+   then implement the smallest passing change. Record any exception when a
+   meaningful automated test cannot be written first. For bugs, that first
+   test is a regression test.
 4. Preserve unrelated work. Do not reset, force-push, or commit/push unless the
    user explicitly asks.
 5. Run the relevant test/lint checks after meaningful edits. Keep code simple;

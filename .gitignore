@@ -3,3 +3,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 .DS_Store
+.playwright-cli
+.venv/
+build/
+*.egg-info/

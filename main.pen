@@ -269,13 +269,16 @@
               "layout": "vertical",
               "gap": "$gap-xs",
               "padding": "$p-sm",
+              "justifyContent": "center",
+              "alignItems": "center",
               "children": [
                 {
                   "type": "frame",
                   "id": "YTrwR",
                   "name": "Big Speed Row",
-                  "width": "fill_container",
-                  "height": 56,
+                  "width": 366,
+                  "height": "fill_container",
+                  "layout": "vertical",
                   "gap": "$gap-sm",
                   "justifyContent": "space_between",
                   "alignItems": "center",
@@ -343,189 +346,214 @@
                   "fontWeight": "normal"
                 },
                 {
-                  "type": "frame",
-                  "id": "Xltk7",
-                  "name": "TTFT Row",
-                  "width": "fill_container",
-                  "height": 22,
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
+                  "type": "group",
+                  "id": "KPWdh",
+                  "name": "Answer Stats",
                   "children": [
                     {
-                      "type": "text",
-                      "id": "ZTES3",
-                      "name": "TTFT Label",
-                      "fill": "$text-secondary",
-                      "content": "TTFT",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "frame",
+                      "id": "Xltk7",
+                      "x": 0,
+                      "y": 0,
+                      "name": "TTFT Row",
+                      "width": "fill_container(366)",
+                      "height": 22,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ZTES3",
+                          "name": "TTFT Label",
+                          "fill": "$text-secondary",
+                          "content": "TTFT",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "nbAMW",
+                          "name": "TTFT Value",
+                          "fill": "$text-primary",
+                          "content": "4.36 s",
+                          "fontFamily": "$font-data",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
                     },
                     {
-                      "type": "text",
-                      "id": "nbAMW",
-                      "name": "TTFT Value",
-                      "fill": "$text-primary",
-                      "content": "4.36 s",
-                      "fontFamily": "$font-data",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "VIKQB",
-                  "name": "Divider",
-                  "fill": "$grid",
-                  "width": "fill_container",
-                  "height": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "R7unE",
-                  "name": "Prompt Row",
-                  "width": "fill_container",
-                  "height": 22,
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "BxP3e",
-                      "name": "Prompt Label",
-                      "fill": "$text-secondary",
-                      "content": "Prompt",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "rectangle",
+                      "id": "VIKQB",
+                      "x": 0,
+                      "y": 26,
+                      "name": "Divider",
+                      "fill": "$grid",
+                      "width": "fill_container(366)",
+                      "height": 1
                     },
                     {
-                      "type": "text",
-                      "id": "whqx3",
-                      "name": "Prompt Value",
-                      "fill": "$text-primary",
-                      "content": "13,377",
-                      "fontFamily": "$font-data",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "dTBI2",
-                  "name": "Divider",
-                  "fill": "$grid",
-                  "width": "fill_container",
-                  "height": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "Jm3MH",
-                  "name": "Output Row",
-                  "width": "fill_container",
-                  "height": 22,
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "sEG3K",
-                      "name": "Output Label",
-                      "fill": "$text-secondary",
-                      "content": "Output",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "frame",
+                      "id": "R7unE",
+                      "x": 0,
+                      "y": 31,
+                      "name": "Prompt Row",
+                      "width": "fill_container(366)",
+                      "height": 22,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BxP3e",
+                          "name": "Prompt Label",
+                          "fill": "$text-secondary",
+                          "content": "Prompt",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "whqx3",
+                          "name": "Prompt Value",
+                          "fill": "$text-primary",
+                          "content": "13,377",
+                          "fontFamily": "$font-data",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
                     },
                     {
-                      "type": "text",
-                      "id": "t2PYM",
-                      "name": "Output Value",
-                      "fill": "$text-primary",
-                      "content": "625",
-                      "fontFamily": "$font-data",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "hLc2Y",
-                  "name": "Divider",
-                  "fill": "$grid",
-                  "width": "fill_container",
-                  "height": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "O5SRu",
-                  "name": "Total Row",
-                  "width": "fill_container",
-                  "height": 22,
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "gh9Jb",
-                      "name": "Total Label",
-                      "fill": "$text-secondary",
-                      "content": "Total",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "rectangle",
+                      "id": "dTBI2",
+                      "x": 0,
+                      "y": 57,
+                      "name": "Divider",
+                      "fill": "$grid",
+                      "width": "fill_container(366)",
+                      "height": 1
                     },
                     {
-                      "type": "text",
-                      "id": "ilK8X",
-                      "name": "Total Value",
-                      "fill": "$text-primary",
-                      "content": "14,002",
-                      "fontFamily": "$font-data",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "rectangle",
-                  "id": "i9PsA",
-                  "name": "Divider",
-                  "fill": "$grid",
-                  "width": "fill_container",
-                  "height": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "FOjjY",
-                  "name": "Generation time Row",
-                  "width": "fill_container",
-                  "height": 22,
-                  "justifyContent": "space_between",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "jHicA",
-                      "name": "Generation time Label",
-                      "fill": "$text-secondary",
-                      "content": "Generation time",
-                      "fontFamily": "$font-heading",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "frame",
+                      "id": "Jm3MH",
+                      "x": 0,
+                      "y": 62,
+                      "name": "Output Row",
+                      "width": "fill_container(366)",
+                      "height": 22,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "sEG3K",
+                          "name": "Output Label",
+                          "fill": "$text-secondary",
+                          "content": "Output",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "t2PYM",
+                          "name": "Output Value",
+                          "fill": "$text-primary",
+                          "content": "625",
+                          "fontFamily": "$font-data",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
                     },
                     {
-                      "type": "text",
-                      "id": "j9Jgf",
-                      "name": "Generation time Value",
-                      "fill": "$text-primary",
-                      "content": "40.8 s",
-                      "fontFamily": "$font-data",
-                      "fontSize": "$text-sm",
-                      "fontWeight": "normal"
+                      "type": "rectangle",
+                      "id": "hLc2Y",
+                      "x": 0,
+                      "y": 88,
+                      "name": "Divider",
+                      "fill": "$grid",
+                      "width": "fill_container(366)",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "O5SRu",
+                      "x": 0,
+                      "y": 93,
+                      "name": "Total Row",
+                      "width": "fill_container(366)",
+                      "height": 22,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "gh9Jb",
+                          "name": "Total Label",
+                          "fill": "$text-secondary",
+                          "content": "Total",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ilK8X",
+                          "name": "Total Value",
+                          "fill": "$text-primary",
+                          "content": "14,002",
+                          "fontFamily": "$font-data",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "i9PsA",
+                      "x": 0,
+                      "y": 119,
+                      "name": "Divider",
+                      "fill": "$grid",
+                      "width": "fill_container(366)",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FOjjY",
+                      "x": 0,
+                      "y": 124,
+                      "name": "Generation time Row",
+                      "width": "fill_container(366)",
+                      "height": 22,
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "jHicA",
+                          "name": "Generation time Label",
+                          "fill": "$text-secondary",
+                          "content": "Generation time",
+                          "fontFamily": "$font-heading",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "j9Jgf",
+                          "name": "Generation time Value",
+                          "fill": "$text-primary",
+                          "content": "40.8 s",
+                          "fontFamily": "$font-data",
+                          "fontSize": "$text-sm",
+                          "fontWeight": "normal"
+                        }
+                      ]
                     }
                   ]
                 }

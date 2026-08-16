@@ -1,3 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lm-speed-viewer"
+version = "0.2.0"
+description = "Passive local LM Studio generation speed viewer"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+lm-speed-viewer = "lm_speed_viewer.cli:main"
+
+[tool.setuptools]
+packages = ["lm_speed_viewer"]
+py-modules = ["app", "db"]
+
+[tool.setuptools.package-data]
+lm_speed_viewer = ["static/*.html", "static/*.css", "static/*.js"]
+
 [tool.ruff]
 line-length = 100
 
@@ -8,3 +33,10 @@ select = ["E", "F"]
 [tool.pytest.ini_options]
 # Make the root-level `app` module importable in tests and resolvable by pytest-cov.
 pythonpath = ["."]
+addopts = "-m 'not browser'"
+markers = [
+    "browser: executes the shipped frontend in Chromium; run separately with -m browser",
+]
+
+[tool.coverage.run]
+source = ["lm_speed_viewer"]
