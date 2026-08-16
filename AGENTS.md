@@ -26,7 +26,7 @@ pip install -r requirements-dev.txt
 python app.py
 ruff check .
 pytest
-pytest --cov=app --cov=db --cov-report=term-missing --cov-fail-under=95
+pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
 ```
 
 ## Operating model

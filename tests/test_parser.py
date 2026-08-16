@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app import PREDICTION_TYPE, parse_line  # noqa: E402
+from lm_speed_viewer.parser import PREDICTION_TYPE, parse_line  # noqa: E402
 
 # Real event captured from `lms log stream --source model --filter output
 # --stats --json` in this environment (output text shortened).

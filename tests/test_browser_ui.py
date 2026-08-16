@@ -15,7 +15,7 @@ pytestmark = pytest.mark.browser
 
 @pytest.fixture()
 def ui_url():
-    root = Path(__file__).resolve().parents[1] / "static"
+    root = Path(__file__).resolve().parents[1]
 
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
@@ -28,7 +28,7 @@ def ui_url():
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        yield f"http://127.0.0.1:{server.server_port}"
+        yield f"http://127.0.0.1:{server.server_port}/static/"
     finally:
         server.shutdown()
         thread.join()
@@ -122,8 +122,6 @@ def test_mobile_recent_table_and_status_detail_use_the_shipped_ui(page, ui_url):
     now = datetime.now(timezone.utc).replace(microsecond=0)
     _open_with_legacy_api(page, ui_url, now)
     assert page.locator("#nextBtn").is_disabled()
-    next_opacity = page.locator("#nextBtn").evaluate("element => getComputedStyle(element).opacity")
-    assert float(next_opacity) < 1
     page.set_viewport_size({"width": 390, "height": 844})
 
     layout = page.evaluate("""() => {
@@ -191,11 +189,12 @@ def test_monthly_graph_and_interactive_vertical_legend(page, ui_url):
     alpha.click()
     assert alpha.get_attribute("aria-pressed") == "false"
     assert page.locator('#graphSvg path[data-model="alpha"]').count() == 0
-    assert float(alpha.evaluate("element => getComputedStyle(element).opacity")) == .5
+    decoration = alpha.evaluate("element => getComputedStyle(element).textDecorationLine")
+    assert decoration == "line-through"
 
 
-def test_model_palette_assigns_unique_base_colours_then_derived_shades(page, ui_url):
-    """Model order, not a hash collision, determines the first six graph colours."""
+def test_model_palette_cycles_after_six_accessible_colours(page, ui_url):
+    """Model order determines the first six graph colours without unchecked shades."""
     page.add_init_script("window.EventSource = class { constructor() {} close() {} };")
     now = datetime.now(timezone.utc).replace(microsecond=0)
     history = {
@@ -224,7 +223,7 @@ def test_model_palette_assigns_unique_base_colours_then_derived_shades(page, ui_
         "rgb(56, 255, 20)", "rgb(229, 184, 0)", "rgb(57, 197, 207)",
         "rgb(188, 140, 255)", "rgb(247, 120, 186)", "rgb(88, 166, 255)",
     ]
-    assert colours[6] not in colours[:6]
+    assert colours[6] == colours[0]
 
 
 def test_penpot_desktop_layout_and_accessible_theme_switch(page, ui_url):
@@ -309,6 +308,106 @@ def test_theme_text_colours_meet_wcag_aa_contrast(page, ui_url):
                              getComputedStyle(document.querySelector(background)).backgroundColor)}));
     }""")
     assert all(item["ratio"] >= 4.5 for item in light_contrasts), light_contrasts
+
+
+def test_theme_colours_meet_wcag_aa_for_all_rendered_treatments(page, ui_url):
+    """Text, boundaries, disabled states, and graph series stay readable in both themes."""
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    _open_with_legacy_api(page, ui_url, now)
+
+    page.evaluate("""() => {
+        hiddenModels.clear();
+        setTheme('dark');
+        const points = graphState.data.series[0].points;
+        renderGraph({series: Array.from({length: 6}, (_, index) => ({
+            model: `model-${index}`, points,
+        }))}, graphState.emptyMessage);
+    }""")
+
+    for theme in ("dark", "light"):
+        if theme == "light":
+            page.evaluate("hiddenModels.clear()")
+            page.get_by_role("button", name="Switch to light theme").click()
+        treatments = page.evaluate("""() => {
+            const rgb = color => {
+                const sample = document.createElement('span');
+                sample.style.color = color;
+                document.body.append(sample);
+                const values = getComputedStyle(sample).color
+                    .match(/\\d+(?:\\.\\d+)?/g).slice(0, 3).map(Number);
+                sample.remove();
+                return values;
+            };
+            const luminance = color => {
+                const values = rgb(color).map(value => {
+                    value /= 255;
+                    return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+                });
+                return .2126 * values[0] + .7152 * values[1] + .0722 * values[2];
+            };
+            const composite = (foreground, background, alpha) => rgb(foreground)
+                .map((value, index) => value * alpha + rgb(background)[index] * (1 - alpha));
+            const ratio = (foreground, background, alpha = 1) => {
+                const mixed = alpha === 1 ? rgb(foreground)
+                    : composite(foreground, background, alpha);
+                const [light, dark] = [luminance(`rgb(${mixed})`), luminance(background)]
+                    .sort((a, b) => b - a);
+                return (light + .05) / (dark + .05);
+            };
+            const style = selector => getComputedStyle(document.querySelector(selector));
+            const background = selector => style(selector).backgroundColor;
+            const grid = document.querySelector('#graphSvg line');
+            return [
+                ['panel border', style('.panel').borderColor, background('.panel')],
+                ['range border', style('.range-btn').borderColor, background('.range-btn')],
+                ['metric border', style('.metric').borderTopColor, background('.live')],
+                ['table divider', style('.data-table td').borderBottomColor,
+                    background('.recent')],
+                ['summary header divider', style('.summary .data-table th').borderBottomColor,
+                    background('.summary .data-table thead')],
+                ['disabled next', style('#nextBtn').color, background('body'),
+                    Number(style('#nextBtn').opacity)],
+                ['graph grid', style('#graphSvg line').stroke, background('.graph'),
+                    Number(grid.getAttribute('stroke-opacity') || 1)],
+                ...[...document.querySelectorAll('#graphSvg circle')].map((point, index) => [
+                    `graph point ${index}`, getComputedStyle(point).fill, background('.graph'),
+                ]),
+            ].map(([name, foreground, background, alpha]) => ({
+                name, ratio: ratio(foreground, background, alpha),
+            }));
+        }""")
+        page.get_by_role("button", name="model-0").click()
+        treatments.extend(page.evaluate("""() => {
+            const rgb = color => {
+                const sample = document.createElement('span');
+                sample.style.color = color;
+                document.body.append(sample);
+                const values = getComputedStyle(sample).color
+                    .match(/\\d+(?:\\.\\d+)?/g).slice(0, 3).map(Number);
+                sample.remove();
+                return values;
+            };
+            const luminance = color => {
+                const values = rgb(color).map(value => {
+                    value /= 255;
+                    return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+                });
+                return .2126 * values[0] + .7152 * values[1] + .0722 * values[2];
+            };
+            const composite = (foreground, background, alpha) => rgb(foreground)
+                .map((value, index) => value * alpha + rgb(background)[index] * (1 - alpha));
+            const ratio = (foreground, background, alpha) => {
+                const mixed = composite(foreground, background, alpha);
+                const [light, dark] = [luminance(`rgb(${mixed})`), luminance(background)]
+                    .sort((a, b) => b - a);
+                return (light + .05) / (dark + .05);
+            };
+            const style = selector => getComputedStyle(document.querySelector(selector));
+            const hidden = style('.legend-item[aria-pressed="false"]');
+            return [{name: 'hidden legend', ratio: ratio(hidden.color,
+                getComputedStyle(document.body).backgroundColor, Number(hidden.opacity))}];
+        }"""))
+        assert all(item["ratio"] >= 4.5 for item in treatments), (theme, treatments)
 
 
 def test_live_prediction_refreshes_the_current_dashboard_window(page, ui_url):

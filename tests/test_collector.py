@@ -10,8 +10,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import db  # noqa: E402
 
-import app as app_module  # noqa: E402
-from app import Collector, PREDICTION_TYPE  # noqa: E402
+from lm_speed_viewer import collector as collector_module  # noqa: E402
+from lm_speed_viewer.collector import Collector  # noqa: E402
+from lm_speed_viewer.parser import PREDICTION_TYPE  # noqa: E402
 
 PREDICTION_LINE = json.dumps({
     "timestamp": 1786744778242,
@@ -106,7 +107,7 @@ def test_publish_ignores_full_queue():
 
 
 def test_start_when_lms_not_found(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", [])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", [])
 
     async def scenario():
         c = Collector()
@@ -123,7 +124,7 @@ def test_start_when_lms_not_found(monkeypatch):
 
 
 def test_start_when_spawn_fails(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", ["/fake/lms"])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", ["/fake/lms"])
 
     async def fake_exec(*args, **kwargs):
         raise OSError("boom")
@@ -140,7 +141,7 @@ def test_start_when_spawn_fails(monkeypatch):
 
 
 def test_start_success(monkeypatch):
-    monkeypatch.setattr(app_module, "LMS_CANDIDATES", ["/fake/lms"])
+    monkeypatch.setattr(collector_module, "LMS_CANDIDATES", ["/fake/lms"])
     proc = FakeProc(stdout_lines=(), stdout_block_on_eof=True)  # stream stays open
 
     async def fake_exec(*args, **kwargs):
