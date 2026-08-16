@@ -3,3 +3,5 @@ pytest>=8.0
 pytest-cov>=7.0
 ruff>=0.16
 httpx2>=2.10
+pyquery>=2.0
+pytest-playwright>=0.5

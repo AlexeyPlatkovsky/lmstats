@@ -16,7 +16,7 @@ import sys
 from contextlib import asynccontextmanager, closing
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 import db
@@ -207,8 +207,12 @@ app = FastAPI(title="LM Speed Viewer", lifespan=lifespan)
 
 
 @app.get("/")
-async def index():
-    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+async def index(response: Response):
+    resp = FileResponse(os.path.join(STATIC_DIR, "index.html"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 
 @app.get("/api/state")
