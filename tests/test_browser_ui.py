@@ -15,7 +15,7 @@ pytestmark = pytest.mark.browser
 
 @pytest.fixture()
 def ui_url():
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[1] / "lm_speed_viewer"
 
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):

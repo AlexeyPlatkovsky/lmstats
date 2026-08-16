@@ -29,11 +29,38 @@ LM Studio in any way.
 
 ## Install
 
+For a standalone command available from any directory, install with
+[pipx](https://pipx.pypa.io/):
+
 ```sh
-pip install -r requirements.txt   # fastapi, uvicorn
+pipx install .
+```
+
+`pipx` creates and manages an isolated virtual environment for the command; do
+not commit a project `.venv`.
+
+For development, create a local environment if desired and install the project
+in editable mode:
+
+```sh
+python -m venv .venv
+source .venv/bin/activate
+pip install -e . -r requirements-dev.txt
 ```
 
 ## Run
+
+```sh
+lm-speed-viewer
+```
+
+Optional configuration:
+
+```sh
+lm-speed-viewer --host 127.0.0.1 --port 8765 --db /tmp/speed-history.db
+```
+
+The compatibility launcher remains available:
 
 ```sh
 python app.py

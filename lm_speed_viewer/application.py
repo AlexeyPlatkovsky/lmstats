@@ -15,7 +15,7 @@ from . import database
 from .collector import Collector
 
 
-STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
 
 def utcnow() -> datetime:
