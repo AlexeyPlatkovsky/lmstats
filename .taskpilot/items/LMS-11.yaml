@@ -1,0 +1,11 @@
+schema_version: 1
+id: LMS-11
+title: Add configurable default maximum generation speed
+priority: normal
+type: task
+status: backlog
+created_at: '2026-08-16T19:54:31Z'
+updated_at: '2026-08-16T19:54:31Z'
+parent_id: LMS-3
+description: 'Add a user-editable settings file that defines the default maximum generation speed in tok/s (initial default: 999). Load and validate the setting safely, document its location and format, preserve the existing default when the file is absent, and add focused tests for valid, missing, and invalid configuration.'
+created_by: codex

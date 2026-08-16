@@ -1,25 +1,39 @@
-# LM Speed Viewer v0.2
+# LM Speed Viewer v1.0
 
-A tiny local web app that shows the statistics of the **latest completed**
-LM Studio generation, with generation speed (tok/s) as the primary metric,
-plus a historical graph of past generations.
+> **See how fast your local LLM is running—at the moment it matters.**
+>
+> LM Speed Viewer turns LM Studio generation logs into a focused live dashboard:
+> speed first, context close behind, and history when you want to compare.
+
+**⚡ Live tok/s** &nbsp; **📈 Built-in history** &nbsp; **🔒 Passive and local**
+
+![LM Speed Viewer dashboard showing generation speed, recent generations, and model history](docs/README.png)
+
+## Make every generation easier to read
+
+LM Speed Viewer is a tiny local web app for the **latest completed** LM Studio
+generation. It puts generation speed (tok/s) front and centre, adds the
+latency and token details that explain it, and keeps a historical graph of past
+generations.
 
 It is a passive observer: it runs the `lms` CLI log stream as a child process
-and displays whatever LM Studio logs. It does not proxy, restart, or configure
+and displays what LM Studio logs. It does not proxy, restart, or configure
 LM Studio in any way.
 
-## What it shows
+## Highlights
 
-- Generation speed (tok/s) — the dominant element
-- Model identifier
-- Time to first token (TTFT)
-- Prompt / output / total token counts
-- Generation time
-- Collector status (Connected / Disconnected / Error / Waiting for first prediction)
-- Historical speed graph (5m / 15m / 1h / 24h ranges, plus the last ten values
-  per model from the past month; stored in SQLite)
-- Clickable model legend for filtering and hover comparison
-- The eight most recent generations, regardless of the selected graph range
+- ⚡ **Speed, first.** See the latest completed generation's tok/s without
+  digging through logs.
+- ⏱ **Context at a glance.** Check the model, time to first token (TTFT),
+  prompt/output/total token counts, and generation time together.
+- 📈 **History that stays useful.** Explore 5m, 15m, 1h, and 24h views, or the
+  past month's last ten values per model—stored locally in SQLite.
+- 🧭 **Compare models clearly.** Filter the graph from its clickable legend and
+  compare values on hover.
+- 🗂 **Recent runs, ready when needed.** Review the eight newest generations,
+  independent of the graph's selected range.
+- 🟢 **Know the collector state.** The dashboard labels Connected,
+  Disconnected, Error, or Waiting for first prediction.
 
 ## Requirements
 
@@ -129,3 +143,32 @@ LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
   removes all historical data.
 - Predictions reporting more than 999 tok/s are ignored as implausible log outliers.
 - More than six models use calculated shades of the six base graph colors.
+
+## FAQ
+
+### Does it control LM Studio or send my prompts anywhere?
+
+No. The viewer passively reads LM Studio's output log stream. It does not
+proxy requests, restart LM Studio, or change its configuration.
+
+### Where is the history stored?
+
+Completed predictions are stored locally in SQLite at
+`~/.lmstudio-speed-viewer/history.db` by default. Use `--db` or the
+`LM_SPEED_VIEWER_DB` environment variable to choose another location.
+
+### Why is the dashboard waiting for a prediction?
+
+The viewer has not yet received a completed generation from the LM Studio log
+stream. Run a generation, then refresh the dashboard if needed.
+
+### Can I clear the history?
+
+Yes. Stop the viewer and remove its SQLite database file, or point the viewer
+at a new database with `--db` or `LM_SPEED_VIEWER_DB`.
+
+### Why might a generation not appear on the graph?
+
+The hero view shows only the latest completed generation. The graph stores
+completed predictions, except implausible log outliers above 999 tok/s; some
+internal LM Studio requests can also temporarily become the latest prediction.
