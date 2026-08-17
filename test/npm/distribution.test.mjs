@@ -20,6 +20,7 @@ test("npm package contains source files but not local Python bytecode", () => {
     "pyproject.toml",
     "requirements.txt",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
   ]);
 });
