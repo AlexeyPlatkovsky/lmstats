@@ -158,7 +158,7 @@ def test_non_string_new_optional_fields_are_none():
     assert p["modelIdentifier"] is None  # non-str model -> None (v0.1 rule)
 
 
-def test_prediction_rate_above_999_is_ignored():
+def test_zero_and_implausibly_high_prediction_rates_are_ignored():
     accepted = json.dumps({
         "data": {
             "type": PREDICTION_TYPE,
@@ -171,6 +171,13 @@ def test_prediction_rate_above_999_is_ignored():
             "stats": {"tokensPerSecond": 1000.0},
         },
     })
+    zero_rate = json.dumps({
+        "data": {
+            "type": PREDICTION_TYPE,
+            "stats": {"tokensPerSecond": 0},
+        },
+    })
 
     assert parse_line(accepted)["tokensPerSecond"] == 999.0
     assert parse_line(line) is None
+    assert parse_line(zero_rate) is None

@@ -28,11 +28,21 @@
   ],
   "scripts": {
     "test": "node --test test/npm/**/*.test.mjs",
+    "lint:js": "eslint lm_speed_viewer/static/app.js",
+    "lint:css": "stylelint lm_speed_viewer/static/styles.css",
+    "lint:ui": "npm run lint:js && npm run lint:css",
     "version:minor": "node scripts/bump-version.mjs minor",
     "version:major": "node scripts/bump-version.mjs major",
     "version:release": "node scripts/bump-version.mjs release"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "stylelint": "^17.14.1",
+    "stylelint-config-standard": "^40.0.0"
   }
 }

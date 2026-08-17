@@ -37,7 +37,9 @@ def parse_line(line):
     stop_reason = stats.get("stopReason")
     output = data.get("output")
     tokens_per_second = num("tokensPerSecond")
-    if tokens_per_second is not None and tokens_per_second > MAX_TOKENS_PER_SECOND:
+    if tokens_per_second == 0 or (
+        tokens_per_second is not None and tokens_per_second > MAX_TOKENS_PER_SECOND
+    ):
         return None
     return {
         "modelIdentifier": model if isinstance(model, str) and model else None,

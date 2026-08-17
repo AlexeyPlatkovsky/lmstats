@@ -288,7 +288,7 @@ async function fetchHistory() {
     recent(data.recent, data.unavailable);
     summary(data.summary, data.unavailable);
     renderGraph(data.history, data.emptyMessage);
-  } catch (error) {
+  } catch {
     if (sequence === fetchSeq) {
       recent([]);
       summary([]);

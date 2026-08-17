@@ -62,6 +62,12 @@ source .venv/bin/activate
 pip install -e . -r requirements-dev.txt
 ```
 
+### Linting
+
+Backend lint uses Ruff (`ruff check .`). Frontend lint uses ESLint and
+Stylelint (`npm run lint:ui`); install the npm dev dependencies once with
+`npm install`. Both run in CI on every pull request.
+
 ### npm
 
 The same CLI is also published as
@@ -130,7 +136,7 @@ LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
   classified and may temporarily become the latest prediction.
 - The history graph stores predictions locally; clearing the SQLite file
   removes all historical data.
-- Predictions reporting more than 999 tok/s are ignored as implausible log outliers.
+- Predictions reporting 0 or more than 999 tok/s are ignored as implausible log outliers.
 - More than six models use calculated shades of the six base graph colors.
 
 ## FAQ

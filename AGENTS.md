@@ -23,8 +23,10 @@ not affect those processes.
 
 ```sh
 pip install -r requirements-dev.txt
+npm install
 python app.py
 ruff check .
+npm run lint:ui
 pytest
 pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
 ```
@@ -44,7 +46,11 @@ pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
 4. Preserve unrelated work. Do not reset, force-push, or commit/push unless the
    user explicitly asks.
 5. Run the relevant test/lint checks after meaningful edits. Keep code simple;
-   do not add speculative abstractions or coverage-only tests.
+   do not add speculative abstractions or coverage-only tests. Backend lint is
+   `ruff check .`; frontend lint is `npm run lint:ui` (ESLint for `static/app.js`,
+   Stylelint for `static/styles.css`). Stylelint's whitespace, declaration count,
+   and selector-ordering rules are disabled because the shipped stylesheet stays
+   minified.
 6. UI changes require a live browser check against `http://127.0.0.1:8765`.
    Use `.claude/skills/playwright-cli/SKILL.md` when the available runtime has
    browser automation; otherwise report that evidence as blocked.
@@ -60,6 +66,7 @@ pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
 Before calling work complete, report the checks actually run:
 
 - `ruff check .`
+- `npm run lint:ui`
 - `pytest`
 - coverage gate above when `app.py` changed
 - browser evidence for UI changes (otherwise N/A)

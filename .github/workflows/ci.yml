@@ -22,8 +22,15 @@ jobs:
           python-version: "3.13"
           cache: pip
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
+
+      - name: Install npm dependencies
+        run: npm ci
 
       - name: "Check: ruff"
         id: ruff
@@ -31,6 +38,13 @@ jobs:
         run: |
           set -o pipefail
           ruff check . 2>&1 | tee /tmp/ruff.log
+
+      - name: "Check: UI lint"
+        id: ui-lint
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run lint:ui 2>&1 | tee /tmp/ui-lint.log
 
       - name: "Check: pytest"
         id: pytest
@@ -50,11 +64,11 @@ jobs:
         id: aggregate
         if: always()
         run: |
-          python - "${{ steps.ruff.outcome }}" "${{ steps.pytest.outcome }}" "${{ steps.coverage.outcome }}" <<'PY'
+          python - "${{ steps.ruff.outcome }}" "${{ steps.ui-lint.outcome }}" "${{ steps.pytest.outcome }}" "${{ steps.coverage.outcome }}" <<'PY'
           import json, re, sys
 
-          outcomes = {"ruff": sys.argv[1], "pytest": sys.argv[2], "coverage": sys.argv[3]}
-          logs = {"ruff": "/tmp/ruff.log", "pytest": "/tmp/pytest.log", "coverage": "/tmp/coverage.log"}
+          outcomes = {"ruff": sys.argv[1], "ui-lint": sys.argv[2], "pytest": sys.argv[3], "coverage": sys.argv[4]}
+          logs = {"ruff": "/tmp/ruff.log", "ui-lint": "/tmp/ui-lint.log", "pytest": "/tmp/pytest.log", "coverage": "/tmp/coverage.log"}
 
           results = {}
           for name, status in outcomes.items():
@@ -64,7 +78,7 @@ jobs:
                   entry = {"status": "skipped"}
               else:
                   entry = {"status": "failed"}
-              if name != "ruff" and entry["status"] == "passed":
+              if name not in {"ruff", "ui-lint"} and entry["status"] == "passed":
                   try:
                       text = open(logs[name]).read()
                   except OSError:
@@ -87,7 +101,7 @@ jobs:
             const fs = require('fs');
             const results = JSON.parse(fs.readFileSync('/tmp/results.json', 'utf8'));
             const marker = '<!-- lm-speed-viewer-ci-report -->';
-            const labels = { ruff: 'Ruff lint', pytest: 'Pytest', coverage: 'Coverage gate' };
+            const labels = { ruff: 'Ruff lint', 'ui-lint': 'UI lint', pytest: 'Pytest', coverage: 'Coverage gate' };
             const rows = Object.keys(results).map((name) => {
               const r = results[name];
               const status =

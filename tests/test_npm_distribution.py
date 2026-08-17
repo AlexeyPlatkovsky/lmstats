@@ -23,6 +23,9 @@ def test_release_metadata_exposes_the_cli_and_current_version():
     assert package["bin"] == {"lm-speed-viewer": "bin/lm-speed-viewer.js"}
     assert package["scripts"] == {
         "test": "node --test test/npm/**/*.test.mjs",
+        "lint:js": "eslint lm_speed_viewer/static/app.js",
+        "lint:css": "stylelint lm_speed_viewer/static/styles.css",
+        "lint:ui": "npm run lint:js && npm run lint:css",
         "version:minor": "node scripts/bump-version.mjs minor",
         "version:major": "node scripts/bump-version.mjs major",
         "version:release": "node scripts/bump-version.mjs release",
