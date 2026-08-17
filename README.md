@@ -1,19 +1,19 @@
-# LM Speed Viewer v0.9
+# LM Stats Viewer v0.9
 
 > **See how fast your local LLM is running—at the moment it matters.**
 >
-> LM Speed Viewer turns LM Studio generation logs into a focused live dashboard:
+> LM Stats Viewer turns LM Studio generation logs into a focused live dashboard:
 > speed first, context close behind, and history when you want to compare.
 
 [![License](https://shields.io/badge/license-Apache%202-blue)](LICENSE) [![Build](https://img.shields.io/badge/build-0.9-blue)]()
 
 **⚡ Live tok/s** &nbsp; **📈 Built-in history** &nbsp; **🔒 Passive and local**
 
-![LM Speed Viewer dashboard showing generation speed, recent generations, and model history](docs/README.png)
+![LM Stats Viewer dashboard showing generation speed, recent generations, and model history](docs/README.png)
 
 ## Make every generation easier to read
 
-LM Speed Viewer is a tiny local web app for the **latest completed** LM Studio
+LM Stats Viewer is a tiny local web app for the **latest completed** LM Studio
 generation. It puts generation speed (tok/s) front and centre, adds the
 latency and token details that explain it, and keeps a historical graph of past
 generations.
