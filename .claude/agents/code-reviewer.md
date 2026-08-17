@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Read-only reviewer for completed LM Speed Viewer changes. Use after non-trivial implementation or instruction changes to find correctness, regression, safety, test, and scope issues.
+description: Read-only reviewer for completed LM Stats Viewer changes. Use after non-trivial implementation or instruction changes to find correctness, regression, safety, test, and scope issues.
 ---
 
 # Code Reviewer

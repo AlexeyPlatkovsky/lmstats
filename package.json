@@ -1,6 +1,6 @@
 {
   "name": "lmstats",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Passive local LM Studio generation speed viewer",
   "type": "module",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "pyproject.toml",
     "requirements.txt",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {

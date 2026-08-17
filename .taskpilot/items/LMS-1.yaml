@@ -1,6 +1,6 @@
 schema_version: 1
 id: LMS-1
-title: LM Speed Viewer v0.2
+title: LM Stats Viewer v0.2
 priority: high
 type: epic
 status: backlog

@@ -1,6 +1,6 @@
 ---
 name: work-with-git
-description: Safely prepares a branch for manager-routed LM Speed Viewer work. Use only when the manager or user requires branch discipline; never commits, pushes, resets, or discards changes.
+description: Safely prepares a branch for manager-routed LM Stats Viewer work. Use only when the manager or user requires branch discipline; never commits, pushes, resets, or discards changes.
 ---
 
 # Work With Git

@@ -100,7 +100,7 @@ jobs:
           script: |
             const fs = require('fs');
             const results = JSON.parse(fs.readFileSync('/tmp/results.json', 'utf8'));
-            const marker = '<!-- lm-speed-viewer-ci-report -->';
+            const marker = '<!-- lmstats-ci-report -->';
             const labels = { ruff: 'Ruff lint', 'ui-lint': 'UI lint', pytest: 'Pytest', coverage: 'Coverage gate' };
             const rows = Object.keys(results).map((name) => {
               const r = results[name];

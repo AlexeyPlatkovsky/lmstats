@@ -1,6 +1,6 @@
 ---
 name: manager
-description: Routes every non-trivial LM Speed Viewer request to the smallest suitable local pipeline, skill, or reviewer before work begins. Use before changing behavior, UI, tests, instructions, architecture, dependencies, or TaskPilot state.
+description: Routes every non-trivial LM Stats Viewer request to the smallest suitable local pipeline, skill, or reviewer before work begins. Use before changing behavior, UI, tests, instructions, architecture, dependencies, or TaskPilot state.
 ---
 
 # Work Manager

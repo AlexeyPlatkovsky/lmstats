@@ -1,6 +1,6 @@
 ---
 name: task-complete
-description: Closes a routed LM Speed Viewer task by checking planned work, evidence, documentation, and required release gates. Use as the final step of a non-trivial pipeline.
+description: Closes a routed LM Stats Viewer task by checking planned work, evidence, documentation, and required release gates. Use as the final step of a non-trivial pipeline.
 ---
 
 # Complete Task
