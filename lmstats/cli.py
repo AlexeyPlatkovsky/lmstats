@@ -1,4 +1,4 @@
-"""Command-line entry point for LM Speed Viewer."""
+"""Command-line entry point for LM Stats Viewer."""
 
 import argparse
 
@@ -13,7 +13,7 @@ PORT = 8765
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the command-line parser without performing any runtime work."""
-    parser = argparse.ArgumentParser(description="Run the local LM Speed Viewer.")
+    parser = argparse.ArgumentParser(description="Run the local LM Stats Viewer.")
     parser.add_argument("--host", default=HOST, help=f"bind address (default: {HOST})")
     parser.add_argument("--port", default=PORT, type=int, help=f"bind port (default: {PORT})")
     parser.add_argument("--db", metavar="PATH", help="SQLite history database path")

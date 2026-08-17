@@ -1,6 +1,6 @@
 # Task 06 — v0.2 Test Plan and Fixtures
 
-You are working on the existing **LM Speed Viewer** repository.
+You are working on the existing **LM Stats Viewer** repository.
 
 This is **stage 6 of 8** for v0.2.
 

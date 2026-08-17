@@ -1,6 +1,6 @@
 # Task 02 — v0.1 Baseline Audit and Current Architecture Map
 
-You are working on the existing **LM Speed Viewer** repository.
+You are working on the existing **LM Stats Viewer** repository.
 
 This is **stage 2 of 8** for v0.2.
 

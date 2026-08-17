@@ -1,16 +1,16 @@
-# AGENTS.md — LM Speed Viewer
+# AGENTS.md — LM Stats Viewer
 
 Read this file before changing the repository.
 
 ## Project
 
-LM Speed Viewer is a local FastAPI + SSE app in `app.py`. It passively runs
+LM Stats Viewer is a local FastAPI + SSE app in `app.py`. It passively runs
 `lms log stream --source model --filter output --stats --json`, keeps the latest
 completed prediction in memory, and serves `http://127.0.0.1:8765`.
 
 v0.2 adds SQLite persistence of all predictions and a historical speed graph
-UI. The database is located at `~/.lmstudio-speed-viewer/history.db` by default
-(overridable via `LM_SPEED_VIEWER_DB`). The app resolves `db.default_db_path()`
+UI. The database is located at `~/.lmstats/history.db` by default
+(overridable via `LMSTATS_DB`). The app resolves `db.default_db_path()`
 at lifespan startup (not import time) so tests can monkeypatch it per-request.
 
 Agents may start and stop `python app.py` for local verification. The viewer's
@@ -28,7 +28,7 @@ python app.py
 ruff check .
 npm run lint:ui
 pytest
-pytest --cov=lm_speed_viewer --cov-report=term-missing --cov-fail-under=95
+pytest --cov=lmstats --cov-report=term-missing --cov-fail-under=95
 ```
 
 ## Operating model

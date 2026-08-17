@@ -1,6 +1,6 @@
 # Task 07 — Implementation Plan and Release Checklist
 
-You are working on the existing **LM Speed Viewer** repository.
+You are working on the existing **LM Stats Viewer** repository.
 
 This is **stage 7 of 8** for v0.2.
 

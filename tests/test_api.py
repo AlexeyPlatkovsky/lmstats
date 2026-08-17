@@ -11,11 +11,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from lm_speed_viewer import collector as collector_module  # noqa: E402
-from lm_speed_viewer import database  # noqa: E402
-from lm_speed_viewer.application import create_app, utcnow  # noqa: E402
-from lm_speed_viewer.collector import Collector  # noqa: E402
-from lm_speed_viewer.parser import PREDICTION_TYPE  # noqa: E402
+from lmstats import collector as collector_module  # noqa: E402
+from lmstats import database  # noqa: E402
+from lmstats.application import create_app, utcnow  # noqa: E402
+from lmstats.collector import Collector  # noqa: E402
+from lmstats.parser import PREDICTION_TYPE  # noqa: E402
 from starlette.requests import Request  # noqa: E402
 
 
@@ -311,7 +311,7 @@ def test_index_serves_frontend(client):
     r = client.get("/")
     assert r.status_code == 200
     assert "text/html" in r.headers["content-type"]
-    assert "LM SPEED VIEWER" in r.text
+    assert "LM STATS VIEWER" in r.text
     assert 'href="/static/styles.css"' in r.text
     assert 'src="/static/app.js"' in r.text
 

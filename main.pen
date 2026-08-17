@@ -6,7 +6,7 @@
       "id": "YYzwH",
       "x": 100,
       "y": 1300,
-      "name": "3. LM Speed Viewer - Terminal Telemetry",
+      "name": "3. LM Stats Viewer - Terminal Telemetry",
       "clip": true,
       "width": 1280,
       "height": 720,
@@ -29,7 +29,7 @@
               "id": "plKf2",
               "name": "App Title",
               "fill": "$text-primary",
-              "content": "LM Speed Viewer",
+              "content": "LM Stats Viewer",
               "fontFamily": "$font-heading",
               "fontSize": "$text-md",
               "fontWeight": "600"

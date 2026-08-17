@@ -1,6 +1,6 @@
 # Task 03 — SQLite Persistence Design
 
-You are working on the existing **LM Speed Viewer** repository.
+You are working on the existing **LM Stats Viewer** repository.
 
 This is **stage 3 of 8** for v0.2.
 

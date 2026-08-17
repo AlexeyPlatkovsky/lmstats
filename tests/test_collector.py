@@ -10,9 +10,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import db  # noqa: E402
 
-from lm_speed_viewer import collector as collector_module  # noqa: E402
-from lm_speed_viewer.collector import Collector  # noqa: E402
-from lm_speed_viewer.parser import PREDICTION_TYPE  # noqa: E402
+from lmstats import collector as collector_module  # noqa: E402
+from lmstats.collector import Collector  # noqa: E402
+from lmstats.parser import PREDICTION_TYPE  # noqa: E402
 
 PREDICTION_LINE = json.dumps({
     "timestamp": 1786744778242,

@@ -273,7 +273,7 @@ async function fetchHistory() {
     if (response.status === 404) {
       response = await fetch("/api/history?range=24h");
       const history = await response.json();
-      const unavailable = "Detailed rows require the dashboard API. Restart LM Speed Viewer to enable them.";
+      const unavailable = "Detailed rows require the dashboard API. Restart LM Stats Viewer to enable them.";
       if (legacyHistoryAvailable(history)) {
         data = {history: filterHistory(history), recent: [], summary: [], unavailable};
       } else {

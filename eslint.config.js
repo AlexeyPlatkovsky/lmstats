@@ -6,7 +6,7 @@ export default [
     ignores: ["test/npm/**", "scripts/**", "node_modules/**"],
   },
   {
-    files: ["lm_speed_viewer/static/**/*.js"],
+    files: ["lmstats/static/**/*.js"],
     ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: "latest",

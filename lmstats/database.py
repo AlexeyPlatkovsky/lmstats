@@ -1,4 +1,4 @@
-"""SQLite persistence for LM Speed Viewer v0.2 (docs/v0.2/03-sqlite-design.md).
+"""SQLite persistence for LM Stats Viewer v0.2 (docs/v0.2/03-sqlite-design.md).
 
 One database file, one `predictions` table, two indexes. Every valid completed
 prediction is inserted exactly once; the latest row loads on startup; history
@@ -39,11 +39,11 @@ EPOCH = datetime.fromtimestamp(0, tz=timezone.utc)
 
 
 def default_db_path() -> str:
-    """Env LM_SPEED_VIEWER_DB override, else ~/.lmstudio-speed-viewer/history.db."""
-    env = os.environ.get("LM_SPEED_VIEWER_DB")
+    """Env LMSTATS_DB override, else ~/.lmstats/history.db."""
+    env = os.environ.get("LMSTATS_DB")
     if env:
         return env
-    return os.path.join(os.path.expanduser("~"), ".lmstudio-speed-viewer", "history.db")
+    return os.path.join(os.path.expanduser("~"), ".lmstats", "history.db")
 
 
 def init_db(path: str) -> None:

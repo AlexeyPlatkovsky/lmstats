@@ -7,11 +7,11 @@ import { spawnSync } from "node:child_process";
 
 const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const packageVersion = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")).version;
-const venvRoot = process.env.LM_SPEED_VIEWER_VENV || join(homedir(), ".lm-speed-viewer", "venvs");
+const venvRoot = process.env.LMSTATS_VENV || join(homedir(), ".lmstats", "venvs");
 const venv = join(venvRoot, packageVersion);
 const isWindows = process.platform === "win32";
 const scriptsDirectory = isWindows ? "Scripts" : "bin";
-const executable = join(venv, scriptsDirectory, isWindows ? "lm-speed-viewer.exe" : "lm-speed-viewer");
+const executable = join(venv, scriptsDirectory, isWindows ? "lmstats.exe" : "lmstats");
 
 function run(command, args) {
   const result = spawnSync(command, args, { stdio: "inherit" });
@@ -35,7 +35,7 @@ function findPython() {
       return candidate;
     }
   }
-  console.error("LM Speed Viewer needs Python 3.10 or newer. Install Python and try again.");
+  console.error("LM Stats Viewer needs Python 3.10 or newer. Install Python and try again.");
   process.exit(1);
 }
 
@@ -43,7 +43,7 @@ const python = findPython();
 const pythonArgs = isWindows && python === "py" ? ["-3"] : [];
 
 if (!existsSync(executable)) {
-  console.log(`Installing LM Speed Viewer ${packageVersion} into ${venv}...`);
+  console.log(`Installing LM Stats Viewer ${packageVersion} into ${venv}...`);
   run(python, [...pythonArgs, "-m", "venv", venv]);
   run(join(venv, scriptsDirectory, isWindows ? "python.exe" : "python"), [
     "-m",

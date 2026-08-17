@@ -32,7 +32,7 @@ def parse_utc(value: str) -> datetime:
 
 
 def create_app(*, collector=None, db_path_resolver=None, clock=None, static_dir=None) -> FastAPI:
-    """Create an isolated LM Speed Viewer application instance."""
+    """Create an isolated LM Stats Viewer application instance."""
     runtime_collector = collector or Collector()
     def path_resolver():
         if db_path_resolver is not None:
@@ -56,7 +56,7 @@ def create_app(*, collector=None, db_path_resolver=None, clock=None, static_dir=
         yield
         await app.state.collector.stop()
 
-    app = FastAPI(title="LM Speed Viewer", lifespan=lifespan)
+    app = FastAPI(title="LM Stats Viewer", lifespan=lifespan)
     app.state.collector = runtime_collector
     app.state.db_path_resolver = path_resolver
     app.state.clock = runtime_clock

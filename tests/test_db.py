@@ -165,11 +165,11 @@ def test_timestamp_format():
 
 
 def test_default_path_override(monkeypatch):
-    monkeypatch.setenv("LM_SPEED_VIEWER_DB", "/tmp/custom-history.db")
+    monkeypatch.setenv("LMSTATS_DB", "/tmp/custom-history.db")
     assert db.default_db_path() == "/tmp/custom-history.db"
-    monkeypatch.delenv("LM_SPEED_VIEWER_DB")
+    monkeypatch.delenv("LMSTATS_DB")
     monkeypatch.setattr(os.path, "expanduser", lambda p: "/fake/home" + p[1:])
-    expected = os.path.join("/fake/home", ".lmstudio-speed-viewer", "history.db")
+    expected = os.path.join("/fake/home", ".lmstats", "history.db")
     assert db.default_db_path() == expected
 
 

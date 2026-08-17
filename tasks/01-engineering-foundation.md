@@ -1,6 +1,6 @@
 # Task 01 — Engineering Foundation and Release Gates
 
-You are working on the existing **LM Speed Viewer v0.1** repository.
+You are working on the existing **LM Stats Viewer v0.1** repository.
 
 This is **stage 1 of 8** for v0.2.
 

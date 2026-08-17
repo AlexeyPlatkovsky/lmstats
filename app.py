@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Compatibility launcher for LM Speed Viewer.
+"""Compatibility launcher for LM Stats Viewer.
 
 Run: ``python app.py`` -> http://127.0.0.1:8765
 """
 
-from lm_speed_viewer import database as db
-from lm_speed_viewer.application import STATIC_DIR, create_app, parse_utc, utcnow
-from lm_speed_viewer.collector import Collector, LMS_CANDIDATES
-from lm_speed_viewer.parser import PREDICTION_TYPE, parse_line
+from lmstats import database as db
+from lmstats.application import STATIC_DIR, create_app, parse_utc, utcnow
+from lmstats.collector import Collector, LMS_CANDIDATES
+from lmstats.parser import PREDICTION_TYPE, parse_line
 
 __all__ = [
     "Collector", "HOST", "LMS_CANDIDATES", "PORT", "PREDICTION_TYPE", "STATIC_DIR",

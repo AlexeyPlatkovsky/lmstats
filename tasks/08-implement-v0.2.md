@@ -1,6 +1,6 @@
-# Task 08 — Implement and Release LM Speed Viewer v0.2
+# Task 08 — Implement and Release LM Stats Viewer v0.2
 
-You are working on the existing **LM Speed Viewer v0.1** repository.
+You are working on the existing **LM Stats Viewer v0.1** repository.
 
 This is **stage 8 of 8**.
 
@@ -28,7 +28,7 @@ If a design document conflicts with the actual working repository, make the smal
 
 ## Goal
 
-Release **LM Speed Viewer v0.2** with:
+Release **LM Stats Viewer v0.2** with:
 
 1. existing v0.1 latest-generation view preserved
 2. SQLite persistence
@@ -194,8 +194,8 @@ Verify explicitly:
 
 1. store a real generation
 2. confirm DB row exists
-3. stop only LM Speed Viewer
-4. restart LM Speed Viewer
+3. stop only LM Stats Viewer
+4. restart LM Stats Viewer
 5. confirm latest telemetry is restored
 6. confirm historical graph data is still available
 

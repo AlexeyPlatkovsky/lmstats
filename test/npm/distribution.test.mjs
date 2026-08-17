@@ -5,16 +5,16 @@ import test from "node:test";
 const packageData = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
 
 test("npm package exposes the Python CLI", () => {
-  assert.equal(packageData.name, "lm-speed-viewer");
+  assert.equal(packageData.name, "lmstats");
   assert.equal(packageData.type, "module");
-  assert.deepEqual(packageData.bin, { "lm-speed-viewer": "bin/lm-speed-viewer.js" });
+  assert.deepEqual(packageData.bin, { "lmstats": "bin/lmstats.js" });
 });
 
 test("npm package contains source files but not local Python bytecode", () => {
   assert.deepEqual(packageData.files, [
     "bin/",
-    "lm_speed_viewer/*.py",
-    "lm_speed_viewer/static/*",
+    "lmstats/*.py",
+    "lmstats/static/*",
     "app.py",
     "db.py",
     "pyproject.toml",

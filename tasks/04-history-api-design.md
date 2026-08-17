@@ -1,6 +1,6 @@
 # Task 04 — History Query and Aggregation Design
 
-You are working on the existing **LM Speed Viewer** repository.
+You are working on the existing **LM Stats Viewer** repository.
 
 This is **stage 4 of 8** for v0.2.
 

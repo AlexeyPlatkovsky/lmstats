@@ -1,6 +1,6 @@
 {
   "name": "lmstats",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Passive local LM Studio generation speed viewer",
   "type": "module",
   "license": "MIT",
@@ -14,8 +14,8 @@
   "homepage": "https://github.com/AlexeyPlatkovsky/lmstats#readme",
   "files": [
     "bin/",
-    "lm_speed_viewer/*.py",
-    "lm_speed_viewer/static/*",
+    "lmstats/*.py",
+    "lmstats/static/*",
     "app.py",
     "db.py",
     "pyproject.toml",
@@ -25,8 +25,8 @@
   ],
   "scripts": {
     "test": "node --test test/npm/**/*.test.mjs",
-    "lint:js": "eslint lm_speed_viewer/static/app.js",
-    "lint:css": "stylelint lm_speed_viewer/static/styles.css",
+    "lint:js": "eslint lmstats/static/app.js",
+    "lint:css": "stylelint lmstats/static/styles.css",
     "lint:ui": "npm run lint:js && npm run lint:css",
     "version:minor": "node scripts/bump-version.mjs minor",
     "version:major": "node scripts/bump-version.mjs major",
@@ -43,6 +43,6 @@
     "stylelint-config-standard": "^40.0.0"
   },
   "bin": {
-    "lmstats": "bin/lm-speed-viewer.js"
+    "lmstats": "bin/lmstats.js"
   }
 }

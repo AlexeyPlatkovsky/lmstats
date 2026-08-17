@@ -1,11 +1,11 @@
-# LM Stats Viewer v0.9
+# LM Stats Viewer
 
 > **See how fast your local LLM is running—at the moment it matters.**
 >
 > LM Stats Viewer turns LM Studio generation logs into a focused live dashboard:
 > speed first, context close behind, and history when you want to compare.
 
-[![License](https://shields.io/badge/license-Apache%202-blue)](LICENSE) [![Build](https://img.shields.io/badge/build-0.9-blue)]()
+[![License](https://shields.io/badge/license-Apache%202-blue)](LICENSE) [![npm version](https://img.shields.io/npm/v/lmstats)](https://www.npmjs.com/package/lmstats)
 
 **⚡ Live tok/s** &nbsp; **📈 Built-in history** &nbsp; **🔒 Passive and local**
 
@@ -46,90 +46,49 @@ LM Studio in any way.
 ## Install
 
 For a standalone command available from any directory, install with
-[pipx](https://pipx.pypa.io/):
+[npm](https://www.npmjs.com/package/lmstats):
 
 ```sh
-pipx install .
+npm install -g lmstats
+```
+Run
+
+```sh
+lmstats
 ```
 
-`pipx` creates and manages an isolated virtual environment for the command; do
-not commit a project `.venv`.
+Then open:
+```
+**http://127.0.0.1:8765**
+```
 
+## Development
 For development, create a local environment if desired and install the project
 in editable mode:
 
 ```sh
+git clone https://github.com/AlexeyPlatkovsky/lmstats.git
+cd lmstats
 python -m venv .venv
 source .venv/bin/activate
 pip install -e . -r requirements-dev.txt
 ```
 
-### Linting
-
-Backend lint uses Ruff (`ruff check .`). Frontend lint uses ESLint and
-Stylelint (`npm run lint:ui`); install the npm dev dependencies once with
-`npm install`. Both run in CI on every pull request.
-
-### npm
-
-The same CLI is also published as
-[`lm-speed-viewer`](https://www.npmjs.com/package/lm-speed-viewer):
-
-```sh
-npm install --global lm-speed-viewer
-lm-speed-viewer
-```
-
-The npm launcher requires Python 3.10+ and creates an isolated environment at
-`~/.lm-speed-viewer/venvs/<version>` the first time it runs. Set
-`LM_SPEED_VIEWER_VENV` to store that environment elsewhere.
-
 ## Run
-
-```sh
-lm-speed-viewer
-```
 
 Optional configuration:
 
 ```sh
-lm-speed-viewer --host 127.0.0.1 --port 8765 --db /tmp/speed-history.db
+lmstats --host 127.0.0.1 --port 8765 --db /tmp/speed-history.db
 ```
 
-The compatibility launcher remains available:
-
-```sh
-python app.py
-```
-
-Then open: **http://127.0.0.1:8765**
-
-
-After a versioned change is merged into `main`, the `Publish npm package`
-workflow runs the package, lint, and Python tests, then publishes only if the
-new version is not already on npm. Merges with no version increase skip
-publishing.
-
-Before the first automated release, configure npm trusted publishing for
-`lm-speed-viewer` with GitHub Actions: owner `AlexeyPlatkovsky`, repository
-`lmstats`, workflow `publish-npm.yml`, and allow `npm publish`. npm requires an
-initial package publication before trusted publishing can be configured; publish
-the first version manually with a short-lived npm token, then add the trusted
-publisher. No npm token is stored in this repository.
 
 ## History persistence
 
 The viewer stores all completed predictions in a local SQLite database
-located at `~/.lmstudio-speed-viewer/history.db` by default. The graph UI
+located at `~/.lmstats/history.db` by default. The graph UI
 reads from this database via the dashboard and history endpoints.
 
-### Override location
-
-Set the `LM_SPEED_VIEWER_DB` environment variable to use a different path:
-
-```sh
-LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
-```
 
 ### Limitations
 
@@ -139,7 +98,6 @@ LM_SPEED_VIEWER_DB=/tmp/speed-history.db python app.py
 - The history graph stores predictions locally; clearing the SQLite file
   removes all historical data.
 - Predictions reporting 0 or more than 999 tok/s are ignored as implausible log outliers.
-- More than six models use calculated shades of the six base graph colors.
 
 ## FAQ
 
@@ -151,8 +109,8 @@ proxy requests, restart LM Studio, or change its configuration.
 ### Where is the history stored?
 
 Completed predictions are stored locally in SQLite at
-`~/.lmstudio-speed-viewer/history.db` by default. Use `--db` or the
-`LM_SPEED_VIEWER_DB` environment variable to choose another location.
+`~/.lmstats/history.db` by default. Use `--db` or the
+`LMSTATS_DB` environment variable to choose another location.
 
 ### Why is the dashboard waiting for a prediction?
 
@@ -162,7 +120,7 @@ stream. Run a generation, then refresh the dashboard if needed.
 ### Can I clear the history?
 
 Yes. Stop the viewer and remove its SQLite database file, or point the viewer
-at a new database with `--db` or `LM_SPEED_VIEWER_DB`.
+at a new database with `--db` or `LMSTATS_DB`.
 
 ### Why might a generation not appear on the graph?
 

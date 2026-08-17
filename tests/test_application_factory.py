@@ -2,9 +2,9 @@
 
 from datetime import datetime, timezone
 
-from lm_speed_viewer import database
-from lm_speed_viewer.application import create_app
-from lm_speed_viewer.collector import Collector
+from lmstats import database
+from lmstats.application import create_app
+from lmstats.collector import Collector
 
 
 def test_create_app_isolates_runtime_services(tmp_path):

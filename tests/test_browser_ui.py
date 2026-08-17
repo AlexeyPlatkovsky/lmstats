@@ -15,7 +15,7 @@ pytestmark = pytest.mark.browser
 
 @pytest.fixture()
 def ui_url():
-    root = Path(__file__).resolve().parents[1] / "lm_speed_viewer"
+    root = Path(__file__).resolve().parents[1] / "lmstats"
 
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
@@ -85,7 +85,7 @@ def test_legacy_fallback_is_honest_and_handles_historical_navigation(page, ui_ur
     requests = _open_with_legacy_api(page, ui_url, now)
 
     assert page.locator("#graphSvg circle").count() == 2
-    unavailable = "Detailed rows require the dashboard API. Restart LM Speed Viewer to enable them."
+    unavailable = "Detailed rows require the dashboard API. Restart LM Stats Viewer to enable them."
     assert unavailable == page.locator("#recentRows").inner_text()
     assert unavailable == page.locator("#summaryRows").inner_text()
 

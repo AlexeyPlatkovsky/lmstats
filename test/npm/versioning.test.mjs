@@ -24,8 +24,8 @@ test("only a semantically higher version is publishable", () => {
   assert.equal(isNewerVersion("0.3.0", "0.3.0"), false);
 });
 
-test("a version bump keeps package metadata and the README heading in sync", async (t) => {
-  const fixtureRoot = await mkdtemp(join(tmpdir(), "lm-speed-viewer-versioning-"));
+test("a version bump leaves the versionless README unchanged", async (t) => {
+  const fixtureRoot = await mkdtemp(join(tmpdir(), "lmstats-versioning-"));
   const scriptsDirectory = join(fixtureRoot, "scripts");
   const bumpScript = await readFile(join(projectRoot, "scripts/bump-version.mjs"), "utf8");
   const versionUtils = await readFile(join(projectRoot, "scripts/version-utils.mjs"), "utf8");
@@ -33,14 +33,17 @@ test("a version bump keeps package metadata and the README heading in sync", asy
   t.after(() => rm(fixtureRoot, { recursive: true, force: true }));
   await mkdir(scriptsDirectory);
   await writeFile(join(fixtureRoot, "package.json"), '{\n  "version": "0.9.0"\n}\n');
+  await writeFile(join(fixtureRoot, "package-lock.json"), '{"version":"0.9.0","packages":{"":{"version":"0.9.0"}}}\n');
   await writeFile(join(fixtureRoot, "pyproject.toml"), '[project]\nversion = "0.9.0"\n');
-  await writeFile(join(fixtureRoot, "README.md"), "# LM Speed Viewer v0.9\n");
+  const readme = "# LM Stats Viewer\n\n[![npm version](https://img.shields.io/npm/v/lmstats)](https://www.npmjs.com/package/lmstats)\n";
+  await writeFile(join(fixtureRoot, "README.md"), readme);
   await writeFile(join(scriptsDirectory, "bump-version.mjs"), bumpScript);
   await writeFile(join(scriptsDirectory, "version-utils.mjs"), versionUtils);
 
   await execFileAsync(process.execPath, [join(scriptsDirectory, "bump-version.mjs"), "minor"]);
 
   assert.match(await readFile(join(fixtureRoot, "package.json"), "utf8"), /"0\.10\.0"/);
+  assert.match(await readFile(join(fixtureRoot, "package-lock.json"), "utf8"), /"0\.10\.0"/);
   assert.match(await readFile(join(fixtureRoot, "pyproject.toml"), "utf8"), /"0\.10\.0"/);
-  assert.match(await readFile(join(fixtureRoot, "README.md"), "utf8"), /v0\.10/);
+  assert.equal(await readFile(join(fixtureRoot, "README.md"), "utf8"), readme);
 });

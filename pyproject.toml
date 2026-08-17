@@ -3,8 +3,8 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lm-speed-viewer"
-version = "0.9.0"
+name = "lmstats"
+version = "0.10.0"
 description = "Passive local LM Studio generation speed viewer"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,14 +14,14 @@ dependencies = [
 ]
 
 [project.scripts]
-lm-speed-viewer = "lm_speed_viewer.cli:main"
+lmstats = "lmstats.cli:main"
 
 [tool.setuptools]
-packages = ["lm_speed_viewer"]
+packages = ["lmstats"]
 py-modules = ["app", "db"]
 
 [tool.setuptools.package-data]
-lm_speed_viewer = ["static/*.html", "static/*.css", "static/*.js"]
+lmstats = ["static/*.html", "static/*.css", "static/*.js"]
 
 [tool.ruff]
 line-length = 100
@@ -39,4 +39,4 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["lm_speed_viewer"]
+source = ["lmstats"]

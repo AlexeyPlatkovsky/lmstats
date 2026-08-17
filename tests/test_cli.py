@@ -1,9 +1,9 @@
-"""Tests for the installable LM Speed Viewer command."""
+"""Tests for the installable LM Stats Viewer command."""
 
 from pathlib import Path
 import tomllib
 
-from lm_speed_viewer import cli
+from lmstats import cli
 
 
 def test_main_creates_configured_application_and_runs_uvicorn(monkeypatch, tmp_path):
