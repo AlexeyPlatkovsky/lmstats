@@ -1,6 +1,6 @@
 ---
 name: implement-change
-description: Implements a scoped LM Speed Viewer code or documentation change after manager routing. Use inside a change or UI pipeline; it does not own final validation or review.
+description: Implements a scoped LM Stats Viewer code or documentation change after manager routing. Use inside a change or UI pipeline; it does not own final validation or review.
 ---
 
 # Implement Change

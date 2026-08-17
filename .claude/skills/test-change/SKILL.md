@@ -1,6 +1,6 @@
 ---
 name: test-change
-description: Designs, adds, or runs focused LM Speed Viewer tests for routed behavior changes. Use before implementation where practical and after implementation to prove parser, collector, API, or SSE behavior.
+description: Designs, adds, or runs focused LM Stats Viewer tests for routed behavior changes. Use before implementation where practical and after implementation to prove parser, collector, API, or SSE behavior.
 ---
 
 # Test Change

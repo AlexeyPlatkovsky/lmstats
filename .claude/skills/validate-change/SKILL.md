@@ -1,6 +1,6 @@
 ---
 name: validate-change
-description: Runs final read-only validation for a routed LM Speed Viewer change. Use after implementation to verify requirements, tests, lint, coverage, UI evidence, documentation, and diff scope.
+description: Runs final read-only validation for a routed LM Stats Viewer change. Use after implementation to verify requirements, tests, lint, coverage, UI evidence, documentation, and diff scope.
 ---
 
 # Validate Change
