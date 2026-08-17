@@ -5,6 +5,8 @@
 > LM Speed Viewer turns LM Studio generation logs into a focused live dashboard:
 > speed first, context close behind, and history when you want to compare.
 
+[![License](https://shields.io/badge/license-Apache%202-blue)](LICENSE) [![Build](https://img.shields.io/badge/build-0.9-blue)]()
+
 **⚡ Live tok/s** &nbsp; **📈 Built-in history** &nbsp; **🔒 Passive and local**
 
 ![LM Speed Viewer dashboard showing generation speed, recent generations, and model history](docs/README.png)
