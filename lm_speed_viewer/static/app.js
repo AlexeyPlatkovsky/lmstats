@@ -236,7 +236,8 @@ function renderGraph(data, emptyMessage = "No generations recorded in this perio
       const timestamp = min + (max - min) * index / 4;
       const position = x(timestamp);
       const label = new Date(timestamp).toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit", timeZone: LOCAL_ZONE});
-      output += `<text x="${position}" y="${height - 4}" text-anchor="middle" fill="var(--color-secondary)" font-size="9">${label}</text>`;
+      const anchor = index === 4 ? "end" : "middle";
+      output += `<text x="${position}" y="${height - 4}" text-anchor="${anchor}" fill="var(--color-secondary)" font-size="9">${label}</text>`;
     }
   }
   for (const [modelIndex, item] of series.entries()) {
@@ -287,7 +288,7 @@ async function fetchHistory() {
     recent(data.recent, data.unavailable);
     summary(data.summary, data.unavailable);
     renderGraph(data.history, data.emptyMessage);
-  } catch (error) {
+  } catch {
     if (sequence === fetchSeq) {
       recent([]);
       summary([]);

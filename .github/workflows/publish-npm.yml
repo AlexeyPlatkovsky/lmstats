@@ -33,10 +33,14 @@ jobs:
       - name: Install Python test dependencies
         run: pip install -r requirements-dev.txt
 
+      - name: Install npm dependencies
+        run: npm ci
+
       - name: Verify package
         run: |
           npm test
           ruff check .
+          npm run lint:ui
           pytest
 
       - name: Decide whether this version is already published

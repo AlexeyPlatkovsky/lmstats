@@ -118,6 +118,24 @@ def test_graph_ticks_tooltip_and_resize_execute_in_the_browser(page, ui_url):
     assert changed != bounds["viewBox"]
 
 
+def test_rightmost_x_axis_label_is_not_clipped(page, ui_url):
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    _open_with_legacy_api(page, ui_url, now)
+
+    for viewport in ({"width": 1280, "height": 720}, {"width": 390, "height": 844}):
+        page.set_viewport_size(viewport)
+        page.wait_for_timeout(50)
+        bounds = page.evaluate("""() => {
+            const svg = document.querySelector('#graphSvg');
+            const labels = svg.querySelectorAll('text');
+            const lastLabel = labels[labels.length - 1].getBoundingClientRect();
+            const svgBounds = svg.getBoundingClientRect();
+            return { labelRight: lastLabel.right, svgRight: svgBounds.right };
+        }""")
+
+        assert bounds["labelRight"] <= bounds["svgRight"]
+
+
 def test_mobile_recent_table_and_status_detail_use_the_shipped_ui(page, ui_url):
     now = datetime.now(timezone.utc).replace(microsecond=0)
     _open_with_legacy_api(page, ui_url, now)

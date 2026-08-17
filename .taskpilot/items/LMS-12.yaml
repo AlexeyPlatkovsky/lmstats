@@ -1,0 +1,11 @@
+schema_version: 1
+id: LMS-12
+title: Add --cleanup command for implausible speed records
+priority: normal
+type: task
+status: backlog
+created_at: '2026-08-16T19:54:32Z'
+updated_at: '2026-08-16T19:54:32Z'
+parent_id: LMS-3
+description: Add a CLI --cleanup command that removes only persisted prediction records whose tokens_per_second exceeds the configured default maximum speed. It must use the same database-resolution behavior as the viewer, report how many rows were deleted, leave all in-range rows intact, document the command, and include focused SQLite/CLI tests. This task depends on the configurable maximum-speed setting.
+created_by: codex
