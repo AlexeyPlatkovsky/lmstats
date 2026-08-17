@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.2
+
+### Fixed
+- Publish retry logic: `scripts/should-publish.mjs` now checks the npm registry even when the version did not change from the previous commit, allowing a failed publish to be retried by a follow-up fix push.
+
 ## 0.10.1
 
 ### Fixed

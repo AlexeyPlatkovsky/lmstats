@@ -110,3 +110,44 @@ def test_publish_check_allows_a_new_main_version_missing_from_npm(tmp_path):
 
     assert result.returncode == 0, result.stderr
     assert result.stdout == "publish=true\n"
+
+
+def test_publish_check_allows_retry_when_version_unchanged_but_not_on_npm(tmp_path):
+    project = tmp_path / "project"
+    scripts = project / "scripts"
+    fake_bin = tmp_path / "bin"
+    scripts.mkdir(parents=True)
+    fake_bin.mkdir()
+    for filename in ("should-publish.mjs", "version-utils.mjs"):
+        (scripts / filename).write_text((ROOT / "scripts" / filename).read_text())
+    (project / "package.json").write_text('{"name":"lmstats","version":"0.2.0"}\n')
+
+    for command in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "test@example.com"],
+        ["git", "config", "user.name", "Test"],
+        ["git", "add", "package.json"],
+        ["git", "commit", "-qm", "initial version"],
+    ):
+        subprocess.run(command, cwd=project, check=True)
+
+    # Version is intentionally unchanged from the previous commit, simulating a
+    # fix push after a failed publish attempt.
+    fake_npm = fake_bin / "npm"
+    fake_npm.write_text(
+        "#!/usr/bin/env node\nconsole.error('npm error code E404');\nprocess.exit(1);\n"
+    )
+    fake_npm.chmod(0o755)
+    environment = os.environ | {"PATH": f"{fake_bin}{os.pathsep}{os.environ['PATH']}"}
+
+    result = subprocess.run(
+        ["node", "scripts/should-publish.mjs", "HEAD"],
+        cwd=project,
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == "publish=true\n"

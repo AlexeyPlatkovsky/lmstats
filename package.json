@@ -1,6 +1,6 @@
 {
   "name": "lmstats",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Passive local LM Studio generation speed viewer",
   "type": "module",
   "license": "MIT",

@@ -21,7 +21,7 @@ try {
   previousPackage = undefined;
 }
 
-if (previousPackage && !isNewerVersion(packageData.version, previousPackage.version)) {
+if (previousPackage && isNewerVersion(previousPackage.version, packageData.version)) {
   console.log("publish=false");
   process.exit(0);
 }
